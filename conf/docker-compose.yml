@@ -36,7 +36,6 @@ services:
 
   hive-metastore:
     build: ./hive-metastore  # build custom HMS image
-    image: hive-metastore:latest
     hostname: hive-metastore
     container_name: hive-metastore
     ports:
