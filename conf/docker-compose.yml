@@ -1,0 +1,71 @@
+version: '3.8'
+
+networks:
+  presto-network:
+    driver: bridge
+
+services:
+  presto-coordinator:
+    container_name: presto-coordinator
+    image: prestodb/presto:0.286-edge1
+    ports:
+      - 8080:8080
+    volumes:
+      - ./presto/etc:/opt/presto-server/etc
+    environment:
+      AWS_ACCESS_KEY: minio
+      AWS_SECRET_ACCESS_KEY: minio123
+    networks:
+      - presto-network
+
+  mysql:
+    image: mysql
+    hostname: mysql
+    container_name: mysql
+    ports:
+      - 3306:3306  # default MySQL port
+    volumes:
+      - mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+      MYSQL_DATABASE: metastore_db
+    networks:
+      - presto-network
+
+  hive-metastore:
+    build: ./hive-metastore  # build custom HMS image
+    image: hive-metastore:latest
+    hostname: hive-metastore
+    container_name: hive-metastore
+    ports:
+      - 9083:9083  # default HMS port
+    volumes:
+      - ./hive-metastore/metastore-site.xml:/opt/apache-hive-metastore-3.0.0-bin/conf/metastore-site.xml:ro
+    environment:
+      DB_HOSTNAME: mysql
+    depends_on:
+      - mysql
+    networks:
+      - presto-network
+
+  minio:
+    image: 'minio/minio:latest'
+    hostname: minio
+    container_name: minio
+    ports:
+      - 9090:9090  # server address
+      - 8443:9091  # console address
+    volumes:
+      - minio-data:/data
+    environment:
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: minio123
+    command: server --address ":9090" --console-address ":9091" /data
+    networks:
+      - presto-network
+
+volumes:
+  minio-data:
+  mysql-data:

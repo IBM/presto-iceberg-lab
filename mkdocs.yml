@@ -1,30 +1,31 @@
 # Project information
-site_name: Workshop Setup
-site_url: https://remkohdev.github.io/workshop-setup
+site_name: Presto Iceberg Workshop - Building an Open Data Lakehouse with Presto, Iceberg & Minio
+site_url: https://ibm.github.io/presto-iceberg-lab/
 site_author: IBM Developer
 
 # Repository
-repo_name: workshop-setup
-repo_url: https://github.com/remkohdev/workshop-setup
-edit_uri: edit/master/docs
+repo_name: presto-iceberg-lab
+repo_url: https://github.com/IBM/presto-iceberg-lab
+edit_uri: edit/main/docs
 
 # Navigation
 nav:
   - Welcome:
     - About the workshop: README.md
   - Workshop:
-    - Lab 0. Pre-work: pre-work/README.md
-    - Lab 1. Some Title: lab-1/README.md
+    - Prerequisite: prerequisite/README.md
+    - Introduction: introduction/README.md
+    - Lab 1. Set up an Open Lakehouse: lab-1/README.md
+    - Lab 2. Set up the Data Source: lab-2/README.md
+    - Lab 3. Exploring Iceberg Tables: lab-3/README.md
   - References:
     - Additional Resources: resources/RESOURCES.md
     - Contributors: resources/CONTRIBUTORS.md
-    - MkDocs Cheatsheet: resources/MKDOCS.md
-    - Admin Guide: resources/ADMIN.md
 
 ## DO NOT CHANGE BELOW THIS LINE
 
 # Copyright
-copyright: Copyright &copy; 2020 IBM Developer
+copyright: Copyright &copy; 2023 IBM Developer
 
 # Theme
 theme:
