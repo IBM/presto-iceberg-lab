@@ -1,7 +1,6 @@
 import os
 import pandas
 import paramiko
-import subprocess
 
 REPO_NAME = "presto-iceberg-lab"
 
@@ -66,6 +65,8 @@ for i, row in df.iterrows():
         print("\tDocker images pulled")
     else:
         print("\tError ", exit_status)
+
+    ssh.close()
 
     break
 
