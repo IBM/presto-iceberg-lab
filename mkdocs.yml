@@ -13,8 +13,8 @@ nav:
   - Welcome:
     - About the workshop: README.md
   - Workshop:
-    - Prerequisite: prerequisite/README.md
     - Introduction: introduction/README.md
+    - Prerequisite: prerequisite/README.md
     - Lab 1. Set up an Open Lakehouse: lab-1/README.md
     - Lab 2. Set up the Data Source: lab-2/README.md
     - Lab 3. Exploring Iceberg Tables: lab-3/README.md
