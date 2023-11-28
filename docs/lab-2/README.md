@@ -13,7 +13,11 @@ As we have already seen, MinIO will act as our underlying data storage for this 
 
 We'll create our bucket using the MinIO UI. Access the Minio UI in a browser at the relevant IP address: `http://<your_ip>:8443`.
 
-| Recall that we assigned a port mapping of `8443:9091` in `docker-compose.yml`, meaning that within the Docker network, the MinIO UI exists on port 9091, but it is exposed on port 8443 when accessing it from outside of the container.
+!!! note
+    If you are using a remote Linux host, use the command `curl https://ipinfo.io/ip` to get your public IP address.
+
+!!! note
+    Recall that we assigned a port mapping of `8443:9091` in `docker-compose.yml`, meaning that within the Docker network, the MinIO UI exists on port 9091, but it is exposed on port 8443 when accessing it from outside of the container.
 
 You will be prompted for a username and password, which are `minio` and `minio123` respectively, once again as defined in our `docker-compose.yml` for the `minio` service `environment` key. Once you are logged in, you will see a webpage like the below that indicates that there are no available bucket and prompts you to create one. Click "Create a Bucket".
 

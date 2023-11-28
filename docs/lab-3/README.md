@@ -24,7 +24,8 @@ $ docker exec -it presto-coordinator presto-cli
 presto>
 ```
 
-| Since the `presto-cli` is executed inside the `coordinator` and `localhost:8080` is the default server, there is no need to specify the `--server` argument.
+!!! note
+    Since the `presto-cli` is executed inside the `coordinator` and `localhost:8080` is the default server, there is no need to specify the `--server` argument.
 
 After you run the command, the prompt should change from the shell prompt `$` to the `presto>` CLI prompt. Run the SQL statement `show catalogs` to see a list of currently configured catalogs:
 

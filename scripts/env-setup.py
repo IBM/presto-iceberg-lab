@@ -53,17 +53,16 @@ for i, row in df.iterrows():
     else:
         print("\tError ", exit_status)
 
+    ssh_stdin.close()
+
     # close connection and log back in for docker installation to take effect
     ssh.close()
     ssh.connect(hostname=public_ip, username=username, pkey=key, port=port)
 
-    # pull docker images in background
     print("Starting pull of docker images in background...")
     ssh.exec_command(f"nohup ./{PULL_SCRIPT} > {PULL_SCRIPT}.out 2> {PULL_SCRIPT}.err &")
 
     ssh.close()
-
-    break
 
 
 
