@@ -57,14 +57,9 @@ for i, row in df.iterrows():
     ssh.close()
     ssh.connect(hostname=public_ip, username=username, pkey=key, port=port)
 
-    # pull docker images and wait until complete
-    print("Pulling docker images...")
-    ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(f"./{PULL_SCRIPT}")
-    exit_status = ssh_stdout.channel.recv_exit_status()  # blocking
-    if exit_status == 0:
-        print("\tDocker images pulled")
-    else:
-        print("\tError ", exit_status)
+    # pull docker images in background
+    print("Starting pull of docker images in background...")
+    ssh.exec_command(f"nohup ./{PULL_SCRIPT} > {PULL_SCRIPT}.out 2> {PULL_SCRIPT}.err &")
 
     ssh.close()
 
