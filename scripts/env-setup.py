@@ -38,23 +38,23 @@ for i, row in df.iterrows():
     ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(f"git clone https://github.com/IBM/{REPO_NAME}.git")
     exit_status = ssh_stdout.channel.recv_exit_status()  # blocking
     if exit_status == 0:
-        print(f"\tRepository {REPO_NAME} cloned")
+        print(f"\tRepository '{REPO_NAME}' cloned")
     else:
         print("\tError ", exit_status)
     
     ssh_stdin.close()
 
-    ssh.exec_command(f"cd {REPO_NAME}/scripts")
-    ssh.exec_command("chmod +x *.sh")
+    ssh.exec_command(f"chmod +x {REPO_NAME}/scripts/*.sh")
 
     # install docker and wait until complete
     print("Installing docker...")
-    ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(f"./docker-install.sh")
+    ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(f"./{REPO_NAME}/scripts/docker-install.sh")
     exit_status = ssh_stdout.channel.recv_exit_status()  # blocking
     if exit_status == 0:
         print("\tDocker installed")
     else:
         print("\tError ", exit_status)
+        print(ssh_stderr)
         break
 
     ssh_stdin.close()
@@ -64,7 +64,7 @@ for i, row in df.iterrows():
     ssh.connect(hostname=public_ip, username=username, pkey=key, port=port)
 
     print("Starting pull of docker images in background...")
-    ssh.exec_command(f"nohup ./docker-images.sh > docker-images.out 2> docker-images.err &")
+    ssh.exec_command(f"nohup ./{REPO_NAME}/scripts/docker-images.sh > docker-images.out 2> docker-images.err &")
 
     ssh.close()
 
