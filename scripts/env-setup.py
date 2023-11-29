@@ -65,7 +65,8 @@ for i, row in df.iterrows():
     ssh.connect(hostname=public_ip, username=username, pkey=key, port=port)
 
     print("Starting pull of docker images in background...")
-    ssh.exec_command(f"nohup ./{REPO_NAME}/scripts/docker-images.sh > docker-images.out 2> docker-images.err &")
+    ssh.exec_command("mkdir logs")
+    ssh.exec_command(f"nohup ./{REPO_NAME}/scripts/docker-images.sh > logs/docker-images.out 2> logs/docker-images.err &")
 
     ssh.close()
 

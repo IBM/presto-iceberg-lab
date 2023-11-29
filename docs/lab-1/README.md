@@ -20,9 +20,10 @@ In order to use Iceberg with Presto, we have to set up an underlying catalog. Re
 
 We'll build a minimal Hive metastore image from the Dockerfile included in this repo.
 
-1. Open a terminal locally, change into the `conf` directory, and run the following command:
+1. Open a terminal locally and run the following commands to build the Hive metastore image:
 
    ```sh
+   cd conf
    docker compose build
    ```
 
@@ -169,6 +170,7 @@ hive.s3.aws-secret-key=minio123
 
 This file includes a required `connector.name` property that indicates we're defining properties for an Iceberg connector. It also lists `hive` as the Iceberg catalog type, as we're using the Hive metastore catalog to support our Iceberg tables, and supplies the URI for the Hive metastore.  The remaining configuration options are specific to the Hive metastore and give the details needed in order to access our underlying s3 data source. When Presto starts, it accesses these configuration files in order to determine which connections it can make.
 
-| Recall that the `metastore.uri` property is the same value defined earlier in the `metastore-site.xml` file that was used to configure the metastore service.
+!!! note
+      Recall that the `metastore.uri` property is the same value defined earlier in the `metastore-site.xml` file that was used to configure the metastore service.
 
 Leveraging high-performance huge-data analytics is as easy as that! Let's move to the next exercise to set up our data source and start creating some Iceberg tables.
