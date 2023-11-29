@@ -174,8 +174,6 @@ The output confirms that we now have a new snapshot, and a new manifest list fil
 
 ## 4. Iceberg time travel
 
-========== stop here if using `prestodb/presto:0.282` image ===========
-
 Another popular feature of Iceberg is time travel, wherein we can query the table state from a given time or snapshot ID. It's also possible to rollback the state of a table to a previous snapshot using its ID. For the purposes of our example, let's say the person that checked out _One Hundred Days of Solitude_ enjoyed it so much that they bought it from the library, taking it out of the inventory. We want to roll the table state back to before we inserted the latest row. Let's first get our snapshot IDs.
 
 ```sh
