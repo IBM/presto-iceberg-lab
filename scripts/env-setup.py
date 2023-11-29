@@ -6,12 +6,13 @@ REPO_NAME = "presto-iceberg-lab"
 
 ENV_CSV_FILE = "workshop.csv"
 PEM_FILE_NAME = "private.pem"
-INSTALL_SCRIPT = "docker-install.sh"
-PULL_SCRIPT = "docker-images.sh"
-REPO_LINK = f"https://github.com/IBM/{REPO_NAME}.git"
 
 df = pandas.read_csv(ENV_CSV_FILE, index_col="Env Num")
 for i, row in df.iterrows():
+    # for testing env 1 only
+    if i != 1:
+        continue
+
     print(f"-------------------- Setting up env {i} --------------------")
 
     username = row["Username"]
@@ -32,21 +33,22 @@ for i, row in df.iterrows():
     # remove created key file
     os.remove(PEM_FILE_NAME)
 
-    print("Transferring local scripts...")
-    ftp_client = ssh.open_sftp()
-    ftp_client.put(INSTALL_SCRIPT, INSTALL_SCRIPT)
-    ftp_client.put(PULL_SCRIPT, PULL_SCRIPT)
-    ftp_client.close()
-    # change script permissions
-    ssh.exec_command("chmod +x *.sh")
-
     # clone github repo
     ssh.exec_command("ssh-keyscan github.com >> ~/.ssh/known_hosts")
-    ssh.exec_command(f"git clone {REPO_LINK}")
+    ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(f"git clone https://github.com/IBM/{REPO_NAME}.git")
+    exit_status = ssh_stdout.channel.recv_exit_status()  # blocking
+    if exit_status == 0:
+        print(f"\tRepository {REPO_NAME} cloned")
+    else:
+        print("\tError ", exit_status)
+    
+    ssh_stdin.close()
+
+    ssh.exec_command(f"cd {REPO_NAME}/scripts")
 
     # install docker and wait until complete
     print("Installing docker...")
-    ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(f"./{INSTALL_SCRIPT}")
+    ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(f"./docker-install.sh")
     exit_status = ssh_stdout.channel.recv_exit_status()  # blocking
     if exit_status == 0:
         print("\tDocker installed")
@@ -60,10 +62,9 @@ for i, row in df.iterrows():
     ssh.connect(hostname=public_ip, username=username, pkey=key, port=port)
 
     print("Starting pull of docker images in background...")
-    ssh.exec_command(f"nohup ./{PULL_SCRIPT} > {PULL_SCRIPT}.out 2> {PULL_SCRIPT}.err &")
+    ssh.exec_command(f"nohup ./docker-images.sh > docker-images.out 2> docker-images.err &")
 
     ssh.close()
-
 
 
 

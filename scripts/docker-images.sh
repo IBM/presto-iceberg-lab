@@ -1,5 +1,5 @@
 #!/bin/bash
 
-cd presto-iceberg-lab/conf
+cd ../conf
 docker compose build
 docker compose pull
