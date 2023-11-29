@@ -33,12 +33,13 @@ for i, row in df.iterrows():
     # remove created key file
     os.remove(PEM_FILE_NAME)
 
-    # clone github repo
+    # clone github repo and wait until complete
+    print(F"Cloning repository '{REPO_NAME}' docker...")
     ssh.exec_command("ssh-keyscan github.com >> ~/.ssh/known_hosts")
     ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(f"git clone https://github.com/IBM/{REPO_NAME}.git")
     exit_status = ssh_stdout.channel.recv_exit_status()  # blocking
     if exit_status == 0:
-        print(f"\tRepository '{REPO_NAME}' cloned")
+        print(f"\tRepository cloned")
     else:
         print("\tError ", exit_status)
     
