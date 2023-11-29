@@ -45,6 +45,7 @@ for i, row in df.iterrows():
     ssh_stdin.close()
 
     ssh.exec_command(f"cd {REPO_NAME}/scripts")
+    ssh.exec_command("chmod +x *.sh")
 
     # install docker and wait until complete
     print("Installing docker...")
@@ -54,6 +55,7 @@ for i, row in df.iterrows():
         print("\tDocker installed")
     else:
         print("\tError ", exit_status)
+        break
 
     ssh_stdin.close()
 
