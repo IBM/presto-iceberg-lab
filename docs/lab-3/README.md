@@ -119,23 +119,51 @@ We can query some of the Iceberg metadata information from Presto. Let's look at
 presto:minio> SELECT * FROM "books$history";
        made_current_at       |     snapshot_id     | parent_id | is_current_ancestor 
 -----------------------------+---------------------+-----------+---------------------
- 2023-11-23 02:18:12.411 UTC | 5661912010858659685 | NULL      | true                
+ 2023-12-04 03:22:51.654 UTC | 7120201811871583704 | NULL      | true                
 (1 row)
 
-Query 20231123_022725_00007_79xda, FINISHED, 1 node
+Query 20231204_032649_00007_8ds9i, FINISHED, 1 node
 Splits: 17 total, 17 done (100.00%)
-[Latency: client-side: 0:01, server-side: 0:01] [1 rows, 17B] [1 rows/s, 20B/s]
+[Latency: client-side: 0:04, server-side: 0:04] [1 rows, 17B] [0 rows/s, 4B/s]
 ```
 
 This shows us that we have a snapshot that was created at the moment we inserted data. We can get more details about the snapshot with the below query:
 
 ```sh
 presto:minio> SELECT * FROM "books$snapshots";
+        committed_at         |     snapshot_id     | parent_id | operation |                                                manifest_list                                                |                                                                                                           summary                                                                                                           
+-----------------------------+---------------------+-----------+-----------+-------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ 2023-12-04 03:22:51.654 UTC | 7120201811871583704 | NULL      | append    | s3a://test-bucket/minio/books/metadata/snap-7120201811871583704-1-c736f70c-53b0-46bd-93e5-5df38eb0ef62.avro | {changed-partition-count=1, added-data-files=1, total-equality-deletes=0, added-records=3, total-position-deletes=0, added-files-size=579, total-delete-files=0, total-files-size=579, total-records=3, total-data-files=1} 
+(1 row)
 ```
 
-This gets us a little more information, such as the manifest list file that this snapshot refers to.
+This gets us a little more information, such as the type of operation, the manifest list file that this snapshot refers to, as well as a summary of the changes that were made as a result of this operation.
 
-There are other hidden tables as well that you can interrogate. Here is a list of all hidden tables that Presto can provide:
+Let's go one level deeper and look at the current manifest list metadata:
+
+```sh
+presto:minio> SELECT * FROM "books$manifests";
+                                        path                                         | length | partition_spec_id |  added_snapshot_id  | added_data_files_count | existing_data_files_count | deleted_data_files_count | partitions 
+-------------------------------------------------------------------------------------+--------+-------------------+---------------------+------------------------+---------------------------+--------------------------+------------
+ s3a://test-bucket/minio/books/metadata/c736f70c-53b0-46bd-93e5-5df38eb0ef62-m0.avro |   6783 |                 0 | 7120201811871583704 |                      1 |                         0 |                        0 | []         
+(1 row)
+```
+
+As promised, the manifest list table show us a list of the manifest files (or file, in this case) associated with our current state.
+
+Lastly, let's look at what the manifests can tell us. To do so, we call on the `files` hidden table:
+
+```sh
+presto:minio> SELECT * FROM "books$files";
+ content |                                    file_path                                    | file_format | record_count | file_size_in_bytes |     column_sizes     |  value_counts   | null_value_counts | nan_value_counts |                 lower_bounds                  |               upper_bounds               | key_metadata | split_offsets | equality_ids 
+---------+---------------------------------------------------------------------------------+-------------+--------------+--------------------+----------------------+-----------------+-------------------+------------------+-----------------------------------------------+------------------------------------------+--------------+---------------+--------------
+       0 | s3a://test-bucket/minio/books/data/27b61673-a995-4810-9aa5-b4675b8483ce.parquet | PARQUET     |            3 |                579 | {1=52, 2=124, 3=103} | {1=3, 2=3, 3=3} | {1=0, 2=0, 3=0}   | {}               | {1=1, 2=Pride and Prejud, 3=F. Scott Fitzger} | {1=3, 2=To Kill a Mockio, 3=Jane Austen} | NULL         | NULL          | NULL         
+(1 row)
+```
+
+We have here a path to the data file and some metadata for that file that can help when determining which files need to be accessed for a certain query.
+
+There are other hidden tables as well that you can interrogate. Here is a summary of all hidden tables that Presto can provide:
 
 - `$properties`: General properties of the given table
 - `$history`: History of table state changes
@@ -168,6 +196,11 @@ At this point, a new snapshot is made current, which we can see by querying the 
 
 ```sh
 presto:minio> SELECT * FROM "books$snapshots";
+        committed_at         |     snapshot_id     |      parent_id      | operation |                                                manifest_list                                                |                                                                                                           summary                                                                                                            
+-----------------------------+---------------------+---------------------+-----------+-------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ 2023-12-04 03:22:51.654 UTC | 7120201811871583704 | NULL                | append    | s3a://test-bucket/minio/books/metadata/snap-7120201811871583704-1-c736f70c-53b0-46bd-93e5-5df38eb0ef62.avro | {changed-partition-count=1, added-data-files=1, total-equality-deletes=0, added-records=3, total-position-deletes=0, added-files-size=579, total-delete-files=0, total-files-size=579, total-records=3, total-data-files=1}  
+ 2023-12-04 03:33:37.630 UTC | 5122816232892408908 | 7120201811871583704 | append    | s3a://test-bucket/minio/books/metadata/snap-5122816232892408908-1-973a8dc3-8103-4df7-8324-1fa13a2f1202.avro | {changed-partition-count=1, added-data-files=1, total-equality-deletes=0, added-records=1, total-position-deletes=0, added-files-size=765, total-delete-files=0, total-files-size=1344, total-records=4, total-data-files=2} 
+(2 rows)
 ```
 
 The output confirms that we now have a new snapshot, and a new manifest list file representing it.
@@ -178,17 +211,17 @@ Another popular feature of Iceberg is time travel, wherein we can query the tabl
 
 ```sh
 presto:minio> SELECT snapshot_id, committed_at FROM "books$snapshots" ORDER BY committed_at;
-     snapshot_id     |              committed_at               
----------------------+-----------------------------------------
- 5837462824399906536 | 2023-11-27 18:15:36.759 America/Chicago 
- 6203469669433850326 | 2023-11-27 18:17:49.206 America/Chicago 
+     snapshot_id     |        committed_at         
+---------------------+-----------------------------
+ 7120201811871583704 | 2023-12-04 03:22:51.654 UTC 
+ 5122816232892408908 | 2023-12-04 03:33:37.630 UTC 
 (2 rows)
 ```
 
 Let's verify that the table is in the expected state at our earliest snapshot ID:
 
 ```sh
-presto:minio> SELECT * FROM books FOR VERSION AS OF 5837462824399906536;
+presto:minio> SELECT * FROM books FOR VERSION AS OF 7120201811871583704;
  id |         title         |       author        | checked_out 
 ----+-----------------------+---------------------+-------------
   1 | Pride and Prejudice   | Jane Austen         | NULL        
@@ -200,7 +233,7 @@ presto:minio> SELECT * FROM books FOR VERSION AS OF 5837462824399906536;
 We could also do the same thing using a timestamp or date. If you run this query, make sure you change the timestamp so that it's accurate for the time at which you're following along.
 
 ```sh
-presto:minio> SELECT * FROM books FOR TIMESTAMP AS OF TIMESTAMP '2023-08-17 13:29:46.822 America/Los_Angeles';
+presto:minio> SELECT * FROM books FOR TIMESTAMP AS OF TIMESTAMP '2023-12-04 03:22:51.700 UTC';
  id |         title         |       author        | checked_out 
 ----+-----------------------+---------------------+-------------
   1 | Pride and Prejudice   | Jane Austen         | NULL        
@@ -212,7 +245,7 @@ presto:minio> SELECT * FROM books FOR TIMESTAMP AS OF TIMESTAMP '2023-08-17 13:2
 Now that we've verified the table state that we want to roll back to, we can call a procedure on the "iceberg" catalog's built-in `system` schema to do so:
 
 ```sh
-presto:minio> CALL iceberg.system.rollback_to_snapshot('minio', 'books', 5837462824399906536);
+presto:minio> CALL iceberg.system.rollback_to_snapshot('minio', 'books', 7120201811871583704);
 CALL
 ```
 

@@ -9,6 +9,6 @@
 
 * TODO
 
-## Minio
+## MinIO
 
 * TODO

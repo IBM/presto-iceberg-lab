@@ -2,7 +2,7 @@
 
 In this section, you will use docker compose to create an open lakehouse with the following components:
 
-- A Minio s3 Object Storage as the data storage component
+- A MinIO s3 Object Storage as the data storage component
 - A Hive metastore server to keep track of table metadata, and a MySQL database to store this metadata
 - A single-node Presto cluster as the SQL query engine
 
@@ -16,7 +16,7 @@ This section is comprised of the following steps:
 
 ## 1. Build the minimal Hive metastore image
 
-In order to use Iceberg with Presto, we have to set up an underlying catalog. Recall that Iceberg is a table format rather than a catalog itself. The Iceberg table format manages *most* metadata in metadata files in the underlying storage (in this case MinIO s3 object storage). A small amount of metadata, however, still requires the use of a meta-datastore, which can be provided by Hive, Nessie, Glue, or Hadoop. We are using the Hive metastore in this case.
+In order to use Iceberg with Presto, we have to set up an underlying catalog. Recall that Iceberg is a table format rather than a catalog itself. The Iceberg table format manages *most* of its metadata in metadata files in the underlying storage (in this case MinIO s3 object storage) alongside the raw data files. A small amount of metadata, however, still requires the use of a meta-datastore, which when using Presto can be provided by Hive, Nessie, Glue, or Hadoop. This "Iceberg catalog" is a central place to find the current location of the current metadata pointer for a table. We are using the Hive metastore in this case.
 
 We'll build a minimal Hive metastore image from the Dockerfile included in this repo.
 
@@ -35,6 +35,8 @@ We'll build a minimal Hive metastore image from the Dockerfile included in this 
    - `fs.s3a.endpoint`: the endpoint that provides the storage for the table data (not the metastore data). The hostname and port given follow the same convention as those mentioned earlier.
    - `fs.s3a.access.key` and `fs.s3a.secret.key`: the username and password required for the metastore to access the underlying table data
    - `fs.s3a.path.style.access`: we set this property to true to indicate that requests will be sent to, for example, `s3.example.com/bucket` instead of `bucket.s3.example.com`
+
+   Once the image has been buildt, we can move to step 2.
 
 2. Check that the `hive-metastore` image has been successfully created:
 
@@ -154,9 +156,13 @@ If the Presto server is up and running properly, the last lines of the output wo
 
 The Presto server will likely take the longest to set up. If you don't see any errors or the `SERVER STARTED` notice, wait a few minutes and check the logs again.
 
+You can also assess the status of your cluster using the Presto UI at the relevant IP address: `http://<your_ip>:8080`. You should see 1 active worker (which is the coordinator node, in our case) and a green "ready" status in the top right corner, as seen below.
+
+![presto ui](../images/presto-ui.png)
+
 ## 4. Connect to Iceberg
 
-Our containers are up and running, but you may be wondering where Iceberg fits into all of this. If we started the Presto CLI right now, we would be able to create tables in Iceberg format - but how? Recall the volume that we passed to the `presto-coordinator` container. This volume includes a directory called `catalog` that was mapped to the `/opt/presto-server/etc` location in the container along with the other server configuration files. The `catalog` directory is where the Presto server looks to see what underlying data sources should be made available to Presto and how to connect to those sources. Let's take a look at the `iceberg.properties` file that was mapped to the Presto cluster.
+Our containers are up and running, but you may be wondering where Iceberg fits into all of this. Presto makes it very easy to get started with Iceberg, with no need to install any additional packages. If we started the Presto CLI right now, we would be able to create tables in Iceberg format - but how? Recall the volume that we passed to the `presto-coordinator` container. This volume includes a directory called `catalog` that was mapped to the `/opt/presto-server/etc` location in the container along with the other server configuration files. The `catalog` directory is where the Presto server looks to see what underlying data sources should be made available to Presto and how to connect to those sources. Let's take a look at the `iceberg.properties` file that was mapped to the Presto cluster.
 
 ```text
 connector.name=iceberg
