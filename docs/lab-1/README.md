@@ -97,12 +97,12 @@ The output of the `up` command will look like the below when all containers have
 
 ```sh
 [+] Running 7/7
- ✔ Network conf_presto-network   Created         0.0s 
- ✔ Volume "conf_minio-data"      Created         0.0s 
- ✔ Volume "conf_mysql-data"      Created         0.0s 
- ✔ Container presto-coordinator  Started         50.0s 
- ✔ Container mysql               Started         50.0s 
- ✔ Container minio               Started         50.0s 
+ ✔ Network conf_presto-network   Created         0.0s
+ ✔ Volume "conf_minio-data"      Created         0.0s
+ ✔ Volume "conf_mysql-data"      Created         0.0s
+ ✔ Container presto-coordinator  Started         50.0s
+ ✔ Container mysql               Started         50.0s
+ ✔ Container minio               Started         50.0s
  ✔ Container hive-metastore      Started         0.0s
 ```
 
@@ -117,9 +117,9 @@ docker logs --tail 100 minio
 If started successfully, the logs for the `minio` container should include something similar to the below:
 
 ```sh
-Status:         1 Online, 0 Offline. 
-S3-API: http://172.18.0.2:9090  http://127.0.0.1:9090 
-Console: http://172.18.0.2:9091 http://127.0.0.1:9091 
+Status:         1 Online, 0 Offline.
+S3-API: http://172.18.0.2:9090  http://127.0.0.1:9090
+Console: http://172.18.0.2:9091 http://127.0.0.1:9091
 ```
 
 We will be using the console address in the next exercise. Let's check that the Hive metastore is running with the following command:
@@ -181,3 +181,6 @@ This file includes a required `connector.name` property that indicates we're def
       Recall that the `metastore.uri` property is the same value defined earlier in the `metastore-site.xml` file that was used to configure the metastore service.
 
 Leveraging high-performance huge-data analytics is as easy as that! Let's move to the next exercise to set up our data source and start creating some Iceberg tables.
+
+<img src="https://count.asgharlabs.io/count?p=/lab1_presto_iceberg_page">
+

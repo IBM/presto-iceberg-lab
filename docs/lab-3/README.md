@@ -31,15 +31,15 @@ After you run the command, the prompt should change from the shell prompt `$` to
 
 ```sh
 presto> show catalogs;
- Catalog 
+ Catalog
 ---------
- hive    
- iceberg 
- jmx     
- memory  
- system  
- tpcds   
- tpch    
+ hive
+ iceberg
+ jmx
+ memory
+ system
+ tpcds
+ tpch
 (7 rows)
 
 Query 20231122_230131_00021_79xda, FINISHED, 1 node
@@ -103,11 +103,11 @@ We can verify our data by running a `SELECT *` statement:
 
 ```sh
 presto:minio> SELECT * FROM books;
- id |         title         |       author        
+ id |         title         |       author
 ----+-----------------------+---------------------
-  1 | Pride and Prejudice   | Jane Austen         
-  2 | To Kill a Mockingbird | Harper Lee          
-  3 | The Great Gatsby      | F. Scott Fitzgerald 
+  1 | Pride and Prejudice   | Jane Austen
+  2 | To Kill a Mockingbird | Harper Lee
+  3 | The Great Gatsby      | F. Scott Fitzgerald
 (3 rows)
 ```
 
@@ -117,9 +117,9 @@ We can query some of the Iceberg metadata information from Presto. Let's look at
 
 ```sh
 presto:minio> SELECT * FROM "books$history";
-       made_current_at       |     snapshot_id     | parent_id | is_current_ancestor 
+       made_current_at       |     snapshot_id     | parent_id | is_current_ancestor
 -----------------------------+---------------------+-----------+---------------------
- 2023-12-04 03:22:51.654 UTC | 7120201811871583704 | NULL      | true                
+ 2023-12-04 03:22:51.654 UTC | 7120201811871583704 | NULL      | true
 (1 row)
 
 Query 20231204_032649_00007_8ds9i, FINISHED, 1 node
@@ -131,9 +131,9 @@ This shows us that we have a snapshot that was created at the moment we inserted
 
 ```sh
 presto:minio> SELECT * FROM "books$snapshots";
-        committed_at         |     snapshot_id     | parent_id | operation |                                                manifest_list                                                |                                                                                                           summary                                                                                                           
+        committed_at         |     snapshot_id     | parent_id | operation |                                                manifest_list                                                |                                                                                                           summary
 -----------------------------+---------------------+-----------+-----------+-------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
- 2023-12-04 03:22:51.654 UTC | 7120201811871583704 | NULL      | append    | s3a://test-bucket/minio/books/metadata/snap-7120201811871583704-1-c736f70c-53b0-46bd-93e5-5df38eb0ef62.avro | {changed-partition-count=1, added-data-files=1, total-equality-deletes=0, added-records=3, total-position-deletes=0, added-files-size=579, total-delete-files=0, total-files-size=579, total-records=3, total-data-files=1} 
+ 2023-12-04 03:22:51.654 UTC | 7120201811871583704 | NULL      | append    | s3a://test-bucket/minio/books/metadata/snap-7120201811871583704-1-c736f70c-53b0-46bd-93e5-5df38eb0ef62.avro | {changed-partition-count=1, added-data-files=1, total-equality-deletes=0, added-records=3, total-position-deletes=0, added-files-size=579, total-delete-files=0, total-files-size=579, total-records=3, total-data-files=1}
 (1 row)
 ```
 
@@ -143,9 +143,9 @@ Let's go one level deeper and look at the current manifest list metadata:
 
 ```sh
 presto:minio> SELECT * FROM "books$manifests";
-                                        path                                         | length | partition_spec_id |  added_snapshot_id  | added_data_files_count | existing_data_files_count | deleted_data_files_count | partitions 
+                                        path                                         | length | partition_spec_id |  added_snapshot_id  | added_data_files_count | existing_data_files_count | deleted_data_files_count | partitions
 -------------------------------------------------------------------------------------+--------+-------------------+---------------------+------------------------+---------------------------+--------------------------+------------
- s3a://test-bucket/minio/books/metadata/c736f70c-53b0-46bd-93e5-5df38eb0ef62-m0.avro |   6783 |                 0 | 7120201811871583704 |                      1 |                         0 |                        0 | []         
+ s3a://test-bucket/minio/books/metadata/c736f70c-53b0-46bd-93e5-5df38eb0ef62-m0.avro |   6783 |                 0 | 7120201811871583704 |                      1 |                         0 |                        0 | []
 (1 row)
 ```
 
@@ -155,9 +155,9 @@ Lastly, let's look at what the manifests can tell us. To do so, we call on the `
 
 ```sh
 presto:minio> SELECT * FROM "books$files";
- content |                                    file_path                                    | file_format | record_count | file_size_in_bytes |     column_sizes     |  value_counts   | null_value_counts | nan_value_counts |                 lower_bounds                  |               upper_bounds               | key_metadata | split_offsets | equality_ids 
+ content |                                    file_path                                    | file_format | record_count | file_size_in_bytes |     column_sizes     |  value_counts   | null_value_counts | nan_value_counts |                 lower_bounds                  |               upper_bounds               | key_metadata | split_offsets | equality_ids
 ---------+---------------------------------------------------------------------------------+-------------+--------------+--------------------+----------------------+-----------------+-------------------+------------------+-----------------------------------------------+------------------------------------------+--------------+---------------+--------------
-       0 | s3a://test-bucket/minio/books/data/27b61673-a995-4810-9aa5-b4675b8483ce.parquet | PARQUET     |            3 |                579 | {1=52, 2=124, 3=103} | {1=3, 2=3, 3=3} | {1=0, 2=0, 3=0}   | {}               | {1=1, 2=Pride and Prejud, 3=F. Scott Fitzger} | {1=3, 2=To Kill a Mockio, 3=Jane Austen} | NULL         | NULL          | NULL         
+       0 | s3a://test-bucket/minio/books/data/27b61673-a995-4810-9aa5-b4675b8483ce.parquet | PARQUET     |            3 |                579 | {1=52, 2=124, 3=103} | {1=3, 2=3, 3=3} | {1=0, 2=0, 3=0}   | {}               | {1=1, 2=Pride and Prejud, 3=F. Scott Fitzger} | {1=3, 2=To Kill a Mockio, 3=Jane Austen} | NULL         | NULL          | NULL
 (1 row)
 ```
 
@@ -196,10 +196,10 @@ At this point, a new snapshot is made current, which we can see by querying the 
 
 ```sh
 presto:minio> SELECT * FROM "books$snapshots";
-        committed_at         |     snapshot_id     |      parent_id      | operation |                                                manifest_list                                                |                                                                                                           summary                                                                                                            
+        committed_at         |     snapshot_id     |      parent_id      | operation |                                                manifest_list                                                |                                                                                                           summary
 -----------------------------+---------------------+---------------------+-----------+-------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
- 2023-12-04 03:22:51.654 UTC | 7120201811871583704 | NULL                | append    | s3a://test-bucket/minio/books/metadata/snap-7120201811871583704-1-c736f70c-53b0-46bd-93e5-5df38eb0ef62.avro | {changed-partition-count=1, added-data-files=1, total-equality-deletes=0, added-records=3, total-position-deletes=0, added-files-size=579, total-delete-files=0, total-files-size=579, total-records=3, total-data-files=1}  
- 2023-12-04 03:33:37.630 UTC | 5122816232892408908 | 7120201811871583704 | append    | s3a://test-bucket/minio/books/metadata/snap-5122816232892408908-1-973a8dc3-8103-4df7-8324-1fa13a2f1202.avro | {changed-partition-count=1, added-data-files=1, total-equality-deletes=0, added-records=1, total-position-deletes=0, added-files-size=765, total-delete-files=0, total-files-size=1344, total-records=4, total-data-files=2} 
+ 2023-12-04 03:22:51.654 UTC | 7120201811871583704 | NULL                | append    | s3a://test-bucket/minio/books/metadata/snap-7120201811871583704-1-c736f70c-53b0-46bd-93e5-5df38eb0ef62.avro | {changed-partition-count=1, added-data-files=1, total-equality-deletes=0, added-records=3, total-position-deletes=0, added-files-size=579, total-delete-files=0, total-files-size=579, total-records=3, total-data-files=1}
+ 2023-12-04 03:33:37.630 UTC | 5122816232892408908 | 7120201811871583704 | append    | s3a://test-bucket/minio/books/metadata/snap-5122816232892408908-1-973a8dc3-8103-4df7-8324-1fa13a2f1202.avro | {changed-partition-count=1, added-data-files=1, total-equality-deletes=0, added-records=1, total-position-deletes=0, added-files-size=765, total-delete-files=0, total-files-size=1344, total-records=4, total-data-files=2}
 (2 rows)
 ```
 
@@ -211,10 +211,10 @@ Another popular feature of Iceberg is time travel, wherein we can query the tabl
 
 ```sh
 presto:minio> SELECT snapshot_id, committed_at FROM "books$snapshots" ORDER BY committed_at;
-     snapshot_id     |        committed_at         
+     snapshot_id     |        committed_at
 ---------------------+-----------------------------
- 7120201811871583704 | 2023-12-04 03:22:51.654 UTC 
- 5122816232892408908 | 2023-12-04 03:33:37.630 UTC 
+ 7120201811871583704 | 2023-12-04 03:22:51.654 UTC
+ 5122816232892408908 | 2023-12-04 03:33:37.630 UTC
 (2 rows)
 ```
 
@@ -222,11 +222,11 @@ Let's verify that the table is in the expected state at our earliest snapshot ID
 
 ```sh
 presto:minio> SELECT * FROM books FOR VERSION AS OF 7120201811871583704;
- id |         title         |       author        | checked_out 
+ id |         title         |       author        | checked_out
 ----+-----------------------+---------------------+-------------
-  1 | Pride and Prejudice   | Jane Austen         | NULL        
-  2 | To Kill a Mockingbird | Harper Lee          | NULL        
-  3 | The Great Gatsby      | F. Scott Fitzgerald | NULL        
+  1 | Pride and Prejudice   | Jane Austen         | NULL
+  2 | To Kill a Mockingbird | Harper Lee          | NULL
+  3 | The Great Gatsby      | F. Scott Fitzgerald | NULL
 (3 rows)
 ```
 
@@ -234,11 +234,11 @@ We could also do the same thing using a timestamp or date. If you run this query
 
 ```sh
 presto:minio> SELECT * FROM books FOR TIMESTAMP AS OF TIMESTAMP '2023-12-04 03:22:51.700 UTC';
- id |         title         |       author        | checked_out 
+ id |         title         |       author        | checked_out
 ----+-----------------------+---------------------+-------------
-  1 | Pride and Prejudice   | Jane Austen         | NULL        
-  2 | To Kill a Mockingbird | Harper Lee          | NULL        
-  3 | The Great Gatsby      | F. Scott Fitzgerald | NULL        
+  1 | Pride and Prejudice   | Jane Austen         | NULL
+  2 | To Kill a Mockingbird | Harper Lee          | NULL
+  3 | The Great Gatsby      | F. Scott Fitzgerald | NULL
 (3 rows)
 ```
 
@@ -253,14 +253,16 @@ Let's verify that the table is back to how it was before:
 
 ```sh
 presto:minio> SELECT * FROM books;
- id |         title         |       author        | checked_out 
+ id |         title         |       author        | checked_out
 ----+-----------------------+---------------------+-------------
-  1 | Pride and Prejudice   | Jane Austen         | NULL        
-  2 | To Kill a Mockingbird | Harper Lee          | NULL        
-  3 | The Great Gatsby      | F. Scott Fitzgerald | NULL        
+  1 | Pride and Prejudice   | Jane Austen         | NULL
+  2 | To Kill a Mockingbird | Harper Lee          | NULL
+  3 | The Great Gatsby      | F. Scott Fitzgerald | NULL
 (3 rows)
 ```
 
 Notice that the table still includes the `checked_out` column. This is to be expected because the snapshot only changes when data files are written to. Removing the column would be another schema evolution operation that only changes the `.metadata.json` file and not the snapshot itself.
 
 You just explored some of Iceberg's key features using Presto! Presto's Iceberg connector has more features than those we've gone over today, such as partitioning and partition column transforms, as well as additional features that are soon-to-come!
+
+<img src="https://count.asgharlabs.io/count?p=/lab3_presto_iceberg_page">
