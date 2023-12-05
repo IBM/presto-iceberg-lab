@@ -44,12 +44,11 @@ We'll build a minimal Hive metastore image from the Dockerfile included in this 
    docker image list
    ```
 
-   You should see the `hive-metastore` image in your list of images, similar to this:
+   You should see a `conf-hive-metastore` image in your list of images, similar to this:
 
    ```sh
-   $ docker network inspect presto_network
     REPOSITORY                       TAG                           IMAGE ID         CREATED          SIZE
-    hive-metastore                   latest                        28377ad2303e     2 minutes ago    1.14GB
+    conf-hive-metastore              latest                        28377ad2303e     2 minutes ago    1.14GB
    ```
 
    This means that the image has been created with the tag `latest`.
