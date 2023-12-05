@@ -26,3 +26,6 @@ You will be prompted for a username and password, which are `minio` and `minio12
 Enter the name `test-bucket` and create the bucket. That's it! You can view the empty bucket in the "Object brower".
 
 Now our s3 object store is ready for use. Let's move to the next section to start creating Iceberg tables in Presto.
+
+<img src="https://count.asgharlabs.io/count?p=/lab2_presto_iceberg_page">
+
