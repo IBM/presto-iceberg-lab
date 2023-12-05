@@ -54,3 +54,5 @@ In this workshop, you will use docker to spin up
 * A MinIO s3-compatible storage instance
 
 Without further ado, let's get started.
+
+<img src="https://count.asgharlabs.io/count?p=/main_presto_iceberg_page">
