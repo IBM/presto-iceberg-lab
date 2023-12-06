@@ -16,8 +16,6 @@ This section is comprised of the following steps:
 
 ## 1. Build the minimal Hive metastore image
 
-https://techzone.ibm.com/my/workshops/student/65662ba2becd9600173b45e4
-
 In order to use Iceberg with Presto, we have to set up an underlying catalog. Recall that Iceberg is a table format rather than a catalog itself. The Iceberg table format manages *most* of its metadata in metadata files in the underlying storage (in this case MinIO s3 object storage) alongside the raw data files. A small amount of metadata, however, still requires the use of a meta-datastore, which when using Presto can be provided by Hive, Nessie, Glue, or Hadoop. This "Iceberg catalog" is a central place to find the current location of the current metadata pointer for a table. We are using the Hive metastore in this case.
 
 We'll build a minimal Hive metastore image from the Dockerfile included in this repo.
