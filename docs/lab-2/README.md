@@ -11,7 +11,7 @@ This section is comprised of the following steps:
 
 As we have already seen, MinIO will act as our underlying data storage for this workshop. MinIO is a high-performance, open-source object storage system. Because it implements the AWS s3 API (i.e., it is "s3-compatible"), we are able to use it to integrate with Presto. These types of object stores use buckets to organize files, giving us a specific location to provide to Presto when we read and write tables.
 
-We'll create our bucket using the MinIO UI. Access the MinIO UI in a browser at the relevant IP address: `http://<your_ip>:8443`.
+We'll create our bucket using the MinIO UI. Access the MinIO UI in a browser at the relevant IP address: `http://<your_ip>:8443`. If you're running everything on your local machine, the address will be `http://localhost:8443`.
 
 !!! note
     If you are using a remote Linux host, use the command `curl https://ipinfo.io/ip` to get your public IP address.
