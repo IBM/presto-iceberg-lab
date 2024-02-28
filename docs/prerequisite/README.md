@@ -11,4 +11,4 @@ git clone https://github.com/IBM/presto-iceberg-lab.git
 cd presto-iceberg-lab
 ```
 
-Alternatively, you can [download the repository as a zip file](https://codeload.github.com/IBM/presto-iceberg-lab/zip/refs/heads/main), unzip it and change into the `presto-iceberg-lab-main` directory.
+Alternatively, you can [download the repository as a zip file](https://codeload.github.com/IBM/presto-iceberg-lab/zip/refs/heads/main), unzip it and change into the `presto-iceberg-lab` main directory.
