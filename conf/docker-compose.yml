@@ -7,7 +7,7 @@ networks:
 services:
   presto-coordinator:
     container_name: presto-coordinator
-    image: prestodb/presto:0.286-edge17  # includes not-yet-released time travel feature
+    image: prestodb/presto:latest
     ports:
       - 8080:8080
     volumes:

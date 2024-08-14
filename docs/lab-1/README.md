@@ -16,7 +16,7 @@ This section is comprised of the following steps:
 
 ## 1. Build the minimal Hive metastore image
 
-In order to use Iceberg with Presto, we have to set up an underlying catalog. Recall that Iceberg is a table format rather than a catalog itself. The Iceberg table format manages *most* of its metadata in metadata files in the underlying storage (in this case MinIO s3 object storage) alongside the raw data files. A small amount of metadata, however, still requires the use of a meta-datastore, which when using Presto can be provided by Hive, Nessie, Glue, or Hadoop. This "Iceberg catalog" is a central place to find the current location of the current metadata pointer for a table. We are using the Hive metastore in this case.
+In order to use Iceberg with Presto, we have to set up an underlying catalog. Recall that Iceberg is a table format rather than a catalog itself. The Iceberg table format manages *most* of its metadata in metadata files in the underlying storage (in this case MinIO s3 object storage) alongside the raw data files. A small amount of metadata, however, still requires the use of a meta-datastore, which when using Presto can be provided by Hive, Nessie, Glue, Hadoop, or via a REST server implementation. This "Iceberg catalog" is a central place to find the current location of the current metadata pointer for a table. We are using the Hive metastore in this case.
 
 We'll build a minimal Hive metastore image from the Dockerfile included in this repo.
 
@@ -65,7 +65,7 @@ This command may also take quite awhile to run, as docker has to pull an image f
 
 First, we define a network: `presto_network`. Each of our containers will communicate across this network.
 
-The next section is the `service` section, which is the bulk of the file. The first service we define is that of the Presto cluster, which we have named `presto-coordinator`. We provide a human-readable `container_name` (also "presto-coordinator") and the Docker `image` that we want this service to be based on, which is the `presto` image with tag `0.286-edge17` hosted in the `prestodb` DockerHub repository. The value `8080:8080` means that we want to map port 8080 on the Docker host (left side of the colon) to port 8080 in the container (right of the colon).
+The next section is the `service` section, which is the bulk of the file. The first service we define is that of the Presto cluster, which we have named `presto-coordinator`. We provide a human-readable `container_name` (also "presto-coordinator") and the Docker `image` that we want this service to be based on, which is the `presto` image with tag `latest` hosted in the `prestodb` DockerHub repository. The value `8080:8080` means that we want to map port 8080 on the Docker host (left side of the colon) to port 8080 in the container (right of the colon).
 
 We also need to supply the Presto container with some necessary configuration files, which we define using the `volume` key. Similar to how we defined the port, we're saying here that we want to map the files that are in the `presto/etc` directory (relative to our current working directory on the command line) to the location is the container corresponding to `/opt/presto-server/etc`, which is the directory that Presto expects to find configuration files. Here are the configuration settings for the Presto server as given in `./presto/etc/config.properties` that we will pass to our server container:
 
