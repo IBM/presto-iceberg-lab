@@ -27,9 +27,9 @@ Presto was open-sourced in 2019 when it was donated to the Linux Foundation and 
 
 ## Table Formats
 
-In the above section, we mentioned that Presto supports multiple file formats and multiple table formats. Let's explore the meaning of these terms more closely. A file format is just the structure of a file that tells a program how to display its contents, as specified by the file extension. For example `.text` is a file format. In the case of a data lakehouse, there are a few different file formats that can be used to store table data. Some popular options are Avro, Parquet, and Orc.
+In the above section, we mentioned that Presto supports multiple file formats and multiple table formats. Let's explore the meaning of these terms more closely. A file format is just the structure of a file that tells a program how to display its contents, as specified by the file extension. For example `.txt` is a file format. In the case of a data lakehouse, there are a few different file formats that can be used to store table data. Some popular options are Avro, Parquet, and Orc.
 
-A table format, on the other hand, is more like a metadata layer between the data file and the means by which it is accessed. A table format determines how the files that make up a table are organized and brings database-like features and efficiency to a data lake. In this way, it is a key part of a data lakehouse. Table formats support features that often aren't available on traditional data lakes, such as ACID transactions and row-level operations. The three most prevalent open table formats are Apache Iceberg, Apache Hudi, and Delta Lake. Take a look at the comparison table below:
+A table format, on the other hand, is more like a metadata layer between the data files and whatever is trying to access the table that is represented by these files. A table format determines how the files that make up a table are organized and brings database-like features and efficiency to a data lake. In this way, it is a key part of a data lakehouse. Table formats support features that often aren't available on traditional data lakes, such as ACID transactions and row-level operations. The three most prevalent open table formats are Apache Iceberg, Apache Hudi, and Delta Lake. Take a look at the comparison table below:
 
 ![table format comparison](../images/comparison-table.png)
 
@@ -50,7 +50,7 @@ Changes made to a table are efficient because a new metadata file is created and
 In this workshop, you will use docker to spin up
 
 * A Presto cluster consisting of a single server node
-* A Hive metastore server with a MySQL server as the underlying database
+* An Iceberg-compatible REST server backed by a PostgreSQL database
 * A MinIO s3-compatible storage instance
 
 Without further ado, let's get started.
