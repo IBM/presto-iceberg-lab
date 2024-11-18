@@ -67,7 +67,7 @@ You should now have the context you need in order to understand the configuratio
 The output of the `up` command will look like the below when all containers have been started:
 
 ```sh
-[+] Running 8/8
+[+] Running 9/9
  ✔ Network conf_presto-network   Created         0.0s
  ✔ Volume "conf_minio-data"      Created         0.0s
  ✔ Volume "conf_postgres-data"   Created         0.0s
@@ -76,6 +76,7 @@ The output of the `up` command will look like the below when all containers have
  ✔ Container postgres            Started         1.0s
  ✔ Container minio               Started         1.0s
  ✔ Container iceberg-rest        Started         1.4s
+ ✔ Container mc                  Started         1.3s
 ```
 
 ## 2. Check that services have started
