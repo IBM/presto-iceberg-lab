@@ -60,10 +60,10 @@ These are the catalogs that we specified when launching the coordinator containe
 - [tpch](http://prestodb.io/docs/current/connector/tpch.html): The TPCH connector provides a set of schemas to
   support the TPC Benchmark™ H (TPC-H).
 
-Now, let's create a schema. A schema is a logical way to organize tables within a catalog. We'll create a schema called "minio" within our "iceberg" catalog. We also want to specify that the tables within this schema are all located in our s3 storage, and more specifically, in the `test-bucket` bucket that we created previously.
+Now, let's create a schema. A schema is a logical way to organize tables within a catalog. We'll create a schema called "minio" within our "iceberg" catalog. We also want to specify that the tables within this schema are all located in our s3 storage, and more specifically, in the `warehouse` bucket that we created previously.
 
 ```sh
-presto> CREATE SCHEMA iceberg.minio with (location = 's3a://test-bucket/');
+presto> CREATE SCHEMA iceberg.minio with (location = 's3a://warehouse/');
 CREATE SCHEMA
 ```
 
@@ -82,11 +82,11 @@ You'll notice that the prompt has changed to also include the schema we're worki
 When creating a new table, we specify the name and the table schema. A table schema is different than the schema we've been referring to up until now. The table schema defines the column names and types. Let's create a table to represent the books that a (very small) library has in their inventory.
 
 ```sh
-presto:minio> CREATE TABLE books (id bigint, title varchar, author varchar) WITH (location = 's3a://test-bucket/minio/books');
+presto:minio> CREATE TABLE books (id bigint, title varchar, author varchar) WITH (location = 's3a://warehouse/minio/books');
 CREATE TABLE
 ```
 
-We now have the table structure, but no data. Let's look into this a little bit. Pull up your MinIO UI and navigate to the `test-bucket/minio/books` directory. Notice that the `minio` and `books` directories were created implicitly with the location property that we passed to `CREATE TABLE`. There should be a single folder at this location called `metadata`. If you go into this directory, you'll see a single metadata file with the extension `.metadata.json`, which stores the table schema information.
+We now have the table structure, but no data. Let's look into this a little bit. Pull up your MinIO UI and navigate to the `warehouse/minio/books` directory. Notice that the `minio` and `books` directories were created implicitly with the location property that we passed to `CREATE TABLE`. There should be a single folder at this location called `metadata`. If you go into this directory, you'll see a single metadata file with the extension `.metadata.json`, which stores the table schema information.
 
 Let's add some data to this table:
 
@@ -111,7 +111,7 @@ presto:minio> SELECT * FROM books;
 (3 rows)
 ```
 
-If we go back to our MinIO UI now, we can see a new folder, `data` in the `test-bucket/minio/books` path. The `data` folder has a single `.parquet` data file inside. This structure of `data` and `metadata` folders is the default for Iceberg tables.
+If we go back to our MinIO UI now, we can see a new folder, `data` in the `warehouse/minio/books` path. The `data` folder has a single `.parquet` data file inside. This structure of `data` and `metadata` folders is the default for Iceberg tables.
 
 We can query some of the Iceberg metadata information from Presto. Let's look at the hidden "history" table from Presto. Note that the quotation marks are required here.
 
@@ -133,7 +133,7 @@ This shows us that we have a snapshot that was created at the moment we inserted
 presto:minio> SELECT * FROM "books$snapshots";
         committed_at         |     snapshot_id     | parent_id | operation |                                                manifest_list                                                |                                                                                                           summary
 -----------------------------+---------------------+-----------+-----------+-------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
- 2023-12-04 03:22:51.654 UTC | 7120201811871583704 | NULL      | append    | s3a://test-bucket/minio/books/metadata/snap-7120201811871583704-1-c736f70c-53b0-46bd-93e5-5df38eb0ef62.avro | {changed-partition-count=1, added-data-files=1, total-equality-deletes=0, added-records=3, total-position-deletes=0, added-files-size=579, total-delete-files=0, total-files-size=579, total-records=3, total-data-files=1}
+ 2023-12-04 03:22:51.654 UTC | 7120201811871583704 | NULL      | append    | s3a://warehouse/minio/books/metadata/snap-7120201811871583704-1-c736f70c-53b0-46bd-93e5-5df38eb0ef62.avro | {changed-partition-count=1, added-data-files=1, total-equality-deletes=0, added-records=3, total-position-deletes=0, added-files-size=579, total-delete-files=0, total-files-size=579, total-records=3, total-data-files=1}
 (1 row)
 ```
 
@@ -145,7 +145,7 @@ Let's go one level deeper and look at the current manifest list metadata:
 presto:minio> SELECT * FROM "books$manifests";
                                         path                                         | length | partition_spec_id |  added_snapshot_id  | added_data_files_count | existing_data_files_count | deleted_data_files_count | partitions
 -------------------------------------------------------------------------------------+--------+-------------------+---------------------+------------------------+---------------------------+--------------------------+------------
- s3a://test-bucket/minio/books/metadata/c736f70c-53b0-46bd-93e5-5df38eb0ef62-m0.avro |   6783 |                 0 | 7120201811871583704 |                      1 |                         0 |                        0 | []
+ s3a://warehouse/minio/books/metadata/c736f70c-53b0-46bd-93e5-5df38eb0ef62-m0.avro |   6783 |                 0 | 7120201811871583704 |                      1 |                         0 |                        0 | []
 (1 row)
 ```
 
@@ -157,7 +157,7 @@ Lastly, let's look at what the manifests can tell us. To do so, we call on the `
 presto:minio> SELECT * FROM "books$files";
  content |                                    file_path                                    | file_format | record_count | file_size_in_bytes |     column_sizes     |  value_counts   | null_value_counts | nan_value_counts |                 lower_bounds                  |               upper_bounds               | key_metadata | split_offsets | equality_ids
 ---------+---------------------------------------------------------------------------------+-------------+--------------+--------------------+----------------------+-----------------+-------------------+------------------+-----------------------------------------------+------------------------------------------+--------------+---------------+--------------
-       0 | s3a://test-bucket/minio/books/data/27b61673-a995-4810-9aa5-b4675b8483ce.parquet | PARQUET     |            3 |                579 | {1=52, 2=124, 3=103} | {1=3, 2=3, 3=3} | {1=0, 2=0, 3=0}   | {}               | {1=1, 2=Pride and Prejud, 3=F. Scott Fitzger} | {1=3, 2=To Kill a Mockio, 3=Jane Austen} | NULL         | NULL          | NULL
+       0 | s3a://warehouse/minio/books/data/27b61673-a995-4810-9aa5-b4675b8483ce.parquet | PARQUET     |            3 |                579 | {1=52, 2=124, 3=103} | {1=3, 2=3, 3=3} | {1=0, 2=0, 3=0}   | {}               | {1=1, 2=Pride and Prejud, 3=F. Scott Fitzger} | {1=3, 2=To Kill a Mockio, 3=Jane Austen} | NULL         | NULL          | NULL
 (1 row)
 ```
 
@@ -198,8 +198,8 @@ At this point, a new snapshot is made current, which we can see by querying the 
 presto:minio> SELECT * FROM "books$snapshots";
         committed_at         |     snapshot_id     |      parent_id      | operation |                                                manifest_list                                                |                                                                                                           summary
 -----------------------------+---------------------+---------------------+-----------+-------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
- 2023-12-04 03:22:51.654 UTC | 7120201811871583704 | NULL                | append    | s3a://test-bucket/minio/books/metadata/snap-7120201811871583704-1-c736f70c-53b0-46bd-93e5-5df38eb0ef62.avro | {changed-partition-count=1, added-data-files=1, total-equality-deletes=0, added-records=3, total-position-deletes=0, added-files-size=579, total-delete-files=0, total-files-size=579, total-records=3, total-data-files=1}
- 2023-12-04 03:33:37.630 UTC | 5122816232892408908 | 7120201811871583704 | append    | s3a://test-bucket/minio/books/metadata/snap-5122816232892408908-1-973a8dc3-8103-4df7-8324-1fa13a2f1202.avro | {changed-partition-count=1, added-data-files=1, total-equality-deletes=0, added-records=1, total-position-deletes=0, added-files-size=765, total-delete-files=0, total-files-size=1344, total-records=4, total-data-files=2}
+ 2023-12-04 03:22:51.654 UTC | 7120201811871583704 | NULL                | append    | s3a://warehouse/minio/books/metadata/snap-7120201811871583704-1-c736f70c-53b0-46bd-93e5-5df38eb0ef62.avro | {changed-partition-count=1, added-data-files=1, total-equality-deletes=0, added-records=3, total-position-deletes=0, added-files-size=579, total-delete-files=0, total-files-size=579, total-records=3, total-data-files=1}
+ 2023-12-04 03:33:37.630 UTC | 5122816232892408908 | 7120201811871583704 | append    | s3a://warehouse/minio/books/metadata/snap-5122816232892408908-1-973a8dc3-8103-4df7-8324-1fa13a2f1202.avro | {changed-partition-count=1, added-data-files=1, total-equality-deletes=0, added-records=1, total-position-deletes=0, added-files-size=765, total-delete-files=0, total-files-size=1344, total-records=4, total-data-files=2}
 (2 rows)
 ```
 

@@ -18,39 +18,43 @@ services:
     networks:
       - presto-network
 
-  mysql:
-    image: mysql
-    hostname: mysql
-    container_name: mysql
+  rest:
+    image: tabulario/iceberg-rest
+    container_name: iceberg-rest
     ports:
-      - 3306:3306  # default MySQL port
+      - 8181:8181
     volumes:
-      - mysql-data:/var/lib/mysql
+      - catalog-data:/catalog
     environment:
-      MYSQL_ROOT_PASSWORD: admin
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: admin
-      MYSQL_DATABASE: metastore_db
+      AWS_ACCESS_KEY_ID: minio
+      AWS_SECRET_ACCESS_KEY: minio123
+      AWS_REGION: us-east-1
+      CATALOG_WAREHOUSE: s3://warehouse/
+      CATALOG_IO__IMPL: org.apache.iceberg.aws.s3.S3FileIO
+      CATALOG_S3_ENDPOINT: http://minio:9090
+      CATALOG_URI: jdbc:postgresql://postgres:5432/metastore_db
     networks:
       - presto-network
-
-  hive-metastore:
-    build: ./hive-metastore  # build custom HMS image
-    hostname: hive-metastore
-    container_name: hive-metastore
-    ports:
-      - 9083:9083  # default HMS port
-    volumes:
-      - ./hive-metastore/metastore-site.xml:/opt/apache-hive-metastore-3.0.0-bin/conf/metastore-site.xml:ro
-    environment:
-      DB_HOSTNAME: mysql
     depends_on:
-      - mysql
+      - postgres
+
+  postgres:
+    image: postgres
+    container_name: postgres
+    hostname: postgres
+    ports:
+      - 5433:5432  # todo change this back to 5432
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: user
+      POSTGRES_DB: metastore_db
     networks:
       - presto-network
 
   minio:
-    image: 'minio/minio:latest'
+    image: minio/minio
     hostname: minio
     container_name: minio
     ports:
@@ -61,10 +65,14 @@ services:
     environment:
       MINIO_ACCESS_KEY: minio
       MINIO_SECRET_KEY: minio123
+      MINIO_DOMAIN: minio
     command: server --address ":9090" --console-address ":9091" /data
     networks:
-      - presto-network
+      presto-network:
+        aliases:
+          - warehouse.minio
 
 volumes:
   minio-data:
-  mysql-data:
+  catalog-data:
+  postgres-data:
