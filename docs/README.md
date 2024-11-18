@@ -25,7 +25,7 @@ The introductory page of the workshop is broken down into the following sections
 | :--- | :--- |
 | [Introduction](introduction/README.md) | Introduction to the technologies used |
 | [Prerequisite](prerequisite/README.md) | Prerequisites for the workshop |
-| [Lab 1: Set up an Open Lakehouse](lab-1/README.md) | Set up a Presto cluster with Hive metastore and data source connection |
+| [Lab 1: Set up an Open Lakehouse](lab-1/README.md) | Set up a Presto cluster with REST catalog and data source connection |
 | [Lab 2: Set up the Data Source](lab-2/README.md) | Set up a storage bucket in MinIO |
 | [Lab 3: Exploring Iceberg Tables](lab-3/README.md) | Explore how to create Iceberg tables and use Iceberg features |
 
