@@ -167,7 +167,7 @@ def check():
 
         print("Checking that docker images have been built/pulled...")
         ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(f"docker image list")
-        images = ["conf-hive-metastore", "prestodb/presto", "minio/minio", "mysql"]
+        images = ["tabulario/iceberg-rest", "prestodb/presto", "minio/minio", "minio/mc", "postgres"]
         cmd_output = ssh_stdout.read().decode('ascii')
         image_missing = False
         for image in images:
