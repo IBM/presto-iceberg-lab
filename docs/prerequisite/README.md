@@ -28,6 +28,8 @@ Once you are logged into your environment, run the following command:
 cd presto-iceberg-lab/conf
 ```
 
+You can skip the next step if you have successfully changed to the `conf` directory.
+
 ## Clone the workshop repository
 
 Various parts of this workshop will require the configuration files from the workshop repository. Use the following command to download the whole repository:
