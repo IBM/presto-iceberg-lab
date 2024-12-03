@@ -17,7 +17,7 @@ chmod 600 <PATH_TO_FILE>/pem_ibmcloudvsi_download.pem
 Now you can log into the environment. Plug in the noted options with the information for your environment.
 
 ```bash
-ssh –i <PATH_TO_FILE>/pem_ibmcloud_vsi_download.pem itzuser@<PUBLIC_IP> -p 2223
+ssh –i <PATH_TO_FILE>/pem_ibmcloudvsi_download.pem itzuser@<PUBLIC_IP> -p 2223
 ```
 
 Once you are logged into your environment, run the following command:
