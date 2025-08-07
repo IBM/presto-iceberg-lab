@@ -33,6 +33,11 @@ services:
       CATALOG_IO__IMPL: org.apache.iceberg.aws.s3.S3FileIO
       CATALOG_S3_ENDPOINT: http://minio:9090
       CATALOG_URI: jdbc:postgresql://postgres:5432/metastore_db
+    entrypoint: >
+      /bin/sh -c "
+      until (openssl s_client -connect postgres:5432 | grep 'Verification: OK') do echo '...waiting...' && sleep 1; done;
+      java -jar iceberg-rest-image-all.jar
+      "
     networks:
       - presto-network
     depends_on:
@@ -81,7 +86,7 @@ services:
       AWS_REGION: us-east-1
     entrypoint: >
       /bin/sh -c "
-      until (/usr/bin/mc config host add minio http://minio:9090 minio minio123) do echo '...waiting...' && sleep 1; done;
+      until (/usr/bin/mc alias set minio http://minio:9090 minio minio123) do echo '...waiting...' && sleep 1; done;
       /usr/bin/mc rm -r --force minio/warehouse;
       /usr/bin/mc mb minio/warehouse;
       /usr/bin/mc policy set public minio/warehouse;
