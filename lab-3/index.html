@@ -1,0 +1,1105 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+        <meta name="author" content="IBM Developer">
+      
+      
+        <link rel="canonical" href="https://ibm.github.io/presto-iceberg-lab/lab-3/">
+      
+      
+        <link rel="prev" href="../lab-2/">
+      
+      
+        <link rel="next" href="../resources/RESOURCES/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.21">
+    
+    
+      
+        <title>Lab 3. Exploring Iceberg Tables - Presto Iceberg Workshop - Building an Open Data Lakehouse with Presto, Iceberg & MinIO</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.2a3383ac.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:300,300i,400,400i,700,700i%7CIBM+Plex+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"IBM Plex Sans";--md-code-font:"IBM Plex Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#exploring-iceberg-tables" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Presto Iceberg Workshop - Building an Open Data Lakehouse with Presto, Iceberg &amp; MinIO" class="md-header__button md-logo" aria-label="Presto Iceberg Workshop - Building an Open Data Lakehouse with Presto, Iceberg & MinIO" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Presto Iceberg Workshop - Building an Open Data Lakehouse with Presto, Iceberg & MinIO
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Lab 3. Exploring Iceberg Tables
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/IBM/presto-iceberg-lab" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    presto-iceberg-lab
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href=".." class="md-tabs__link">
+          
+  
+  
+  Welcome
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../introduction/" class="md-tabs__link">
+          
+  
+  
+  Workshop
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../resources/RESOURCES/" class="md-tabs__link">
+          
+  
+  
+  References
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Presto Iceberg Workshop - Building an Open Data Lakehouse with Presto, Iceberg &amp; MinIO" class="md-nav__button md-logo" aria-label="Presto Iceberg Workshop - Building an Open Data Lakehouse with Presto, Iceberg & MinIO" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Presto Iceberg Workshop - Building an Open Data Lakehouse with Presto, Iceberg & MinIO
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/IBM/presto-iceberg-lab" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    presto-iceberg-lab
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Welcome
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Welcome
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    About the workshop
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Workshop
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Workshop
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prerequisite/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Prerequisite
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lab-1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Lab 1. Set up an Open Lakehouse
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lab-2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Lab 2. Set up the Data Source
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Lab 3. Exploring Iceberg Tables
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Lab 3. Exploring Iceberg Tables
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-creating-a-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Creating a schema
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-creating-an-iceberg-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Creating an Iceberg table
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-iceberg-schema-evolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Iceberg schema evolution
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-iceberg-time-travel" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Iceberg time travel
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    References
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            References
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resources/RESOURCES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Additional Resources
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resources/CONTRIBUTORS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contributors
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-creating-a-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Creating a schema
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-creating-an-iceberg-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Creating an Iceberg table
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-iceberg-schema-evolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Iceberg schema evolution
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-iceberg-time-travel" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Iceberg time travel
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="exploring-iceberg-tables">Exploring Iceberg Tables<a class="headerlink" href="#exploring-iceberg-tables" title="Permanent link">&para;</a></h1>
+<p>In this section, we will create Iceberg tables and explore their structure in the underlying data source. We will also take a look at the hidden tables that Presto provides for Iceberg that give information on the table metadata. We'll also use some of Iceberg's key features - schema evolution and time travel - from Presto to get an idea of how they work.</p>
+<p>This section is comprised of the following steps:</p>
+<ul>
+<li><a href="#exploring-iceberg-tables">Exploring Iceberg Tables</a></li>
+<li><a href="#1-creating-a-schema">1. Creating a schema</a></li>
+<li><a href="#2-creating-an-iceberg-table">2. Creating an Iceberg table</a></li>
+<li><a href="#3-iceberg-schema-evolution">3. Iceberg schema evolution</a></li>
+<li><a href="#4-iceberg-time-travel">4. Iceberg time travel</a></li>
+</ul>
+<h2 id="1-creating-a-schema">1. Creating a schema<a class="headerlink" href="#1-creating-a-schema" title="Permanent link">&para;</a></h2>
+<p>First, let's learn how to run the Presto CLI to connect to the coordinator. There are several ways to do that:</p>
+<ol>
+<li>Download the executable jar from the official repository and run the jar file with a proper JVM. You can see details in this <a href="http://prestodb.io/docs/current/installation/cli.html#install-the-presto-cli">documentation</a>.</li>
+<li>Use the <code>presto-cli</code> that comes with the <code>prestodb/presto</code> Docker image</li>
+</ol>
+<p>For this lab, since we run everything on Docker containers, we are going to use the second approach. You can run the <code>presto-cli</code> inside the coordinator container with the below command:</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>presto-coordinator<span class="w"> </span>presto-cli
+presto&gt;
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Since the <code>presto-cli</code> is executed inside the <code>coordinator</code> and <code>localhost:8080</code> is the default server, there is no need to specify the <code>--server</code> argument.</p>
+</div>
+<p>After you run the command, the prompt should change from the shell prompt <code>$</code> to the <code>presto&gt;</code> CLI prompt. Run the SQL statement <code>show catalogs</code> to see a list of currently configured catalogs:</p>
+<div class="highlight"><pre><span></span><code>presto&gt;<span class="w"> </span>show<span class="w"> </span>catalogs<span class="p">;</span>
+<span class="w"> </span>Catalog
+---------
+<span class="w"> </span>hive
+<span class="w"> </span>iceberg
+<span class="w"> </span>jmx
+<span class="w"> </span>memory
+<span class="w"> </span>system
+<span class="w"> </span>tpcds
+<span class="w"> </span>tpch
+<span class="o">(</span><span class="m">7</span><span class="w"> </span>rows<span class="o">)</span>
+
+Query<span class="w"> </span>20231122_230131_00021_79xda,<span class="w"> </span>FINISHED,<span class="w"> </span><span class="m">1</span><span class="w"> </span>node
+Splits:<span class="w"> </span><span class="m">19</span><span class="w"> </span>total,<span class="w"> </span><span class="m">19</span><span class="w"> </span><span class="k">done</span><span class="w"> </span><span class="o">(</span><span class="m">100</span>.00%<span class="o">)</span>
+<span class="o">[</span>Latency:<span class="w"> </span>client-side:<span class="w"> </span>173ms,<span class="w"> </span>server-side:<span class="w"> </span>163ms<span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span>rows,<span class="w"> </span>0B<span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span>rows/s,<span class="w"> </span>0B/s<span class="o">]</span>
+</code></pre></div>
+<p>These are the catalogs that we specified when launching the coordinator container by using the configurations from the <code>presto/catalog</code> directory. The <code>hive</code> and <code>iceberg</code> catalogs here are expected, but here is a short description of the rest:</p>
+<ul>
+<li><a href="http://prestodb.io/docs/current/connector/jmx.html">jmx</a>: The JMX connector provides the ability to query JMX
+  information from all nodes in a Presto cluster.</li>
+<li><a href="http://prestodb.io/docs/current/connector/memory.html">memory</a>: The Memory connector stores all data and metadata
+  in RAM on workers and both are discarded when Presto restarts.</li>
+<li><a href="http://prestodb.io/docs/current/connector/system.html">system</a>: The System connector provides information and
+  metrics about the currently running Presto cluster.</li>
+<li><a href="http://prestodb.io/docs/current/connector/tpcds.html">tpcds</a>: The TPCDS connector provides a set of schemas
+  to support the TPC Benchmark™ DS (TPC-DS)</li>
+<li><a href="http://prestodb.io/docs/current/connector/tpch.html">tpch</a>: The TPCH connector provides a set of schemas to
+  support the TPC Benchmark™ H (TPC-H).</li>
+</ul>
+<p>Now, let's create a schema. A schema is a logical way to organize tables within a catalog. We'll create a schema called "minio" within our "iceberg" catalog. We also want to specify that the tables within this schema are all located in our s3 storage, and more specifically, in the <code>warehouse</code> bucket that we created previously.</p>
+<div class="highlight"><pre><span></span><code>presto&gt;<span class="w"> </span>CREATE<span class="w"> </span>SCHEMA<span class="w"> </span>iceberg.minio<span class="w"> </span>with<span class="w"> </span><span class="o">(</span><span class="nv">location</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;s3a://warehouse/&#39;</span><span class="o">)</span><span class="p">;</span>
+CREATE<span class="w"> </span>SCHEMA
+</code></pre></div>
+<p>We'll be working almost exclusively with the "iceberg" catalog and "minio" schema, so we can employ a <code>USE</code> statement to indicate that all the queries we run will be against tables in this catalog/schema combination unless specificed. Otherwise, we would have to use the fully-qualified table name for every statement (i.e., <code>iceberg.minio.&lt;table_name&gt;</code>).</p>
+<div class="highlight"><pre><span></span><code>presto&gt;<span class="w"> </span>USE<span class="w"> </span>iceberg.minio<span class="p">;</span>
+USE
+presto:minio&gt;
+</code></pre></div>
+<p>You'll notice that the prompt has changed to also include the schema we're working in. Now we're ready to create a table!</p>
+<h2 id="2-creating-an-iceberg-table">2. Creating an Iceberg table<a class="headerlink" href="#2-creating-an-iceberg-table" title="Permanent link">&para;</a></h2>
+<p>When creating a new table, we specify the name and the table schema. A table schema is different than the schema we've been referring to up until now. The table schema defines the column names and types. Let's create a table to represent the books that a (very small) library has in their inventory.</p>
+<div class="highlight"><pre><span></span><code>presto:minio&gt;<span class="w"> </span>CREATE<span class="w"> </span>TABLE<span class="w"> </span>books<span class="w"> </span><span class="o">(</span>id<span class="w"> </span>bigint,<span class="w"> </span>title<span class="w"> </span>varchar,<span class="w"> </span>author<span class="w"> </span>varchar<span class="o">)</span><span class="w"> </span>WITH<span class="w"> </span><span class="o">(</span><span class="nv">location</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;s3a://warehouse/minio/books&#39;</span><span class="o">)</span><span class="p">;</span>
+CREATE<span class="w"> </span>TABLE
+</code></pre></div>
+<p>We now have the table structure, but no data. Let's look into this a little bit. Pull up your MinIO UI and navigate to the <code>warehouse/minio/books</code> directory. Notice that the <code>minio</code> and <code>books</code> directories were created implicitly with the location property that we passed to <code>CREATE TABLE</code>. There should be a single folder at this location called <code>metadata</code>. If you go into this directory, you'll see a single metadata file with the extension <code>.metadata.json</code>, which stores the table schema information.</p>
+<p>Let's add some data to this table:</p>
+<div class="highlight"><pre><span></span><code>presto:minio&gt;<span class="w"> </span>INSERT<span class="w"> </span>INTO<span class="w"> </span>books<span class="w"> </span>VALUES<span class="w"> </span><span class="o">(</span><span class="m">1</span>,<span class="w"> </span><span class="s1">&#39;Pride and Prejudice&#39;</span>,<span class="w"> </span><span class="s1">&#39;Jane Austen&#39;</span><span class="o">)</span>,<span class="w"> </span><span class="o">(</span><span class="m">2</span>,<span class="w"> </span><span class="s1">&#39;To Kill a Mockingbird&#39;</span>,<span class="w"> </span><span class="s1">&#39;Harper Lee&#39;</span><span class="o">)</span>,<span class="w"> </span><span class="o">(</span><span class="m">3</span>,<span class="w"> </span><span class="s1">&#39;The Great Gatsby&#39;</span>,<span class="w"> </span><span class="s1">&#39;F. Scott Fitzgerald&#39;</span><span class="o">)</span><span class="p">;</span>
+INSERT:<span class="w"> </span><span class="m">3</span><span class="w"> </span>rows
+
+Query<span class="w"> </span>20231123_021811_00005_79xda,<span class="w"> </span>FINISHED,<span class="w"> </span><span class="m">1</span><span class="w"> </span>node
+Splits:<span class="w"> </span><span class="m">35</span><span class="w"> </span>total,<span class="w"> </span><span class="m">35</span><span class="w"> </span><span class="k">done</span><span class="w"> </span><span class="o">(</span><span class="m">100</span>.00%<span class="o">)</span>
+<span class="o">[</span>Latency:<span class="w"> </span>client-side:<span class="w"> </span><span class="m">0</span>:01,<span class="w"> </span>server-side:<span class="w"> </span><span class="m">0</span>:01<span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span>rows,<span class="w"> </span>0B<span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span>rows/s,<span class="w"> </span>0B/s<span class="o">]</span>
+</code></pre></div>
+<p>We can verify our data by running a <code>SELECT *</code> statement:</p>
+<div class="highlight"><pre><span></span><code>presto:minio&gt;<span class="w"> </span>SELECT<span class="w"> </span>*<span class="w"> </span>FROM<span class="w"> </span>books<span class="p">;</span>
+<span class="w"> </span>id<span class="w"> </span><span class="p">|</span><span class="w">         </span>title<span class="w">         </span><span class="p">|</span><span class="w">       </span>author
+----+-----------------------+---------------------
+<span class="w">  </span><span class="m">1</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>Pride<span class="w"> </span>and<span class="w"> </span>Prejudice<span class="w">   </span><span class="p">|</span><span class="w"> </span>Jane<span class="w"> </span>Austen
+<span class="w">  </span><span class="m">2</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>To<span class="w"> </span>Kill<span class="w"> </span>a<span class="w"> </span>Mockingbird<span class="w"> </span><span class="p">|</span><span class="w"> </span>Harper<span class="w"> </span>Lee
+<span class="w">  </span><span class="m">3</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>The<span class="w"> </span>Great<span class="w"> </span>Gatsby<span class="w">      </span><span class="p">|</span><span class="w"> </span>F.<span class="w"> </span>Scott<span class="w"> </span>Fitzgerald
+<span class="o">(</span><span class="m">3</span><span class="w"> </span>rows<span class="o">)</span>
+</code></pre></div>
+<p>If we go back to our MinIO UI now, we can see a new folder, <code>data</code> in the <code>warehouse/minio/books</code> path. The <code>data</code> folder has a single <code>.parquet</code> data file inside. This structure of <code>data</code> and <code>metadata</code> folders is the default for Iceberg tables.</p>
+<p>We can query some of the Iceberg metadata information from Presto. Let's look at the hidden "history" table from Presto. Note that the quotation marks are required here.</p>
+<div class="highlight"><pre><span></span><code>presto:minio&gt;<span class="w"> </span>SELECT<span class="w"> </span>*<span class="w"> </span>FROM<span class="w"> </span><span class="s2">&quot;books</span><span class="nv">$history</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="w">       </span>made_current_at<span class="w">       </span><span class="p">|</span><span class="w">     </span>snapshot_id<span class="w">     </span><span class="p">|</span><span class="w"> </span>parent_id<span class="w"> </span><span class="p">|</span><span class="w"> </span>is_current_ancestor
+-----------------------------+---------------------+-----------+---------------------
+<span class="w"> </span><span class="m">2023</span>-12-04<span class="w"> </span><span class="m">03</span>:22:51.654<span class="w"> </span>UTC<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">7120201811871583704</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>NULL<span class="w">      </span><span class="p">|</span><span class="w"> </span><span class="nb">true</span>
+<span class="o">(</span><span class="m">1</span><span class="w"> </span>row<span class="o">)</span>
+
+Query<span class="w"> </span>20231204_032649_00007_8ds9i,<span class="w"> </span>FINISHED,<span class="w"> </span><span class="m">1</span><span class="w"> </span>node
+Splits:<span class="w"> </span><span class="m">17</span><span class="w"> </span>total,<span class="w"> </span><span class="m">17</span><span class="w"> </span><span class="k">done</span><span class="w"> </span><span class="o">(</span><span class="m">100</span>.00%<span class="o">)</span>
+<span class="o">[</span>Latency:<span class="w"> </span>client-side:<span class="w"> </span><span class="m">0</span>:04,<span class="w"> </span>server-side:<span class="w"> </span><span class="m">0</span>:04<span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="m">1</span><span class="w"> </span>rows,<span class="w"> </span>17B<span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span>rows/s,<span class="w"> </span>4B/s<span class="o">]</span>
+</code></pre></div>
+<p>This shows us that we have a snapshot that was created at the moment we inserted data. We can get more details about the snapshot with the below query:</p>
+<div class="highlight"><pre><span></span><code>presto:minio&gt;<span class="w"> </span>SELECT<span class="w"> </span>*<span class="w"> </span>FROM<span class="w"> </span><span class="s2">&quot;books</span><span class="nv">$snapshots</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="w">        </span>committed_at<span class="w">         </span><span class="p">|</span><span class="w">     </span>snapshot_id<span class="w">     </span><span class="p">|</span><span class="w"> </span>parent_id<span class="w"> </span><span class="p">|</span><span class="w"> </span>operation<span class="w"> </span><span class="p">|</span><span class="w">                                                </span>manifest_list<span class="w">                                                </span><span class="p">|</span><span class="w">                                                                                                           </span>summary
+-----------------------------+---------------------+-----------+-----------+-------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+<span class="w"> </span><span class="m">2023</span>-12-04<span class="w"> </span><span class="m">03</span>:22:51.654<span class="w"> </span>UTC<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">7120201811871583704</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>NULL<span class="w">      </span><span class="p">|</span><span class="w"> </span>append<span class="w">    </span><span class="p">|</span><span class="w"> </span>s3a://warehouse/minio/books/metadata/snap-7120201811871583704-1-c736f70c-53b0-46bd-93e5-5df38eb0ef62.avro<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="o">{</span>changed-partition-count<span class="o">=</span><span class="m">1</span>,<span class="w"> </span>added-data-files<span class="o">=</span><span class="m">1</span>,<span class="w"> </span>total-equality-deletes<span class="o">=</span><span class="m">0</span>,<span class="w"> </span>added-records<span class="o">=</span><span class="m">3</span>,<span class="w"> </span>total-position-deletes<span class="o">=</span><span class="m">0</span>,<span class="w"> </span>added-files-size<span class="o">=</span><span class="m">579</span>,<span class="w"> </span>total-delete-files<span class="o">=</span><span class="m">0</span>,<span class="w"> </span>total-files-size<span class="o">=</span><span class="m">579</span>,<span class="w"> </span>total-records<span class="o">=</span><span class="m">3</span>,<span class="w"> </span>total-data-files<span class="o">=</span><span class="m">1</span><span class="o">}</span>
+<span class="o">(</span><span class="m">1</span><span class="w"> </span>row<span class="o">)</span>
+</code></pre></div>
+<p>This gets us a little more information, such as the type of operation, the manifest list file that this snapshot refers to, as well as a summary of the changes that were made as a result of this operation.</p>
+<p>Let's go one level deeper and look at the current manifest list metadata:</p>
+<div class="highlight"><pre><span></span><code>presto:minio&gt;<span class="w"> </span>SELECT<span class="w"> </span>*<span class="w"> </span>FROM<span class="w"> </span><span class="s2">&quot;books</span><span class="nv">$manifests</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="w">                                        </span>path<span class="w">                                         </span><span class="p">|</span><span class="w"> </span>length<span class="w"> </span><span class="p">|</span><span class="w"> </span>partition_spec_id<span class="w"> </span><span class="p">|</span><span class="w">  </span>added_snapshot_id<span class="w">  </span><span class="p">|</span><span class="w"> </span>added_data_files_count<span class="w"> </span><span class="p">|</span><span class="w"> </span>existing_data_files_count<span class="w"> </span><span class="p">|</span><span class="w"> </span>deleted_data_files_count<span class="w"> </span><span class="p">|</span><span class="w"> </span>partitions
+-------------------------------------------------------------------------------------+--------+-------------------+---------------------+------------------------+---------------------------+--------------------------+------------
+<span class="w"> </span>s3a://warehouse/minio/books/metadata/c736f70c-53b0-46bd-93e5-5df38eb0ef62-m0.avro<span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="m">6783</span><span class="w"> </span><span class="p">|</span><span class="w">                 </span><span class="m">0</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">7120201811871583704</span><span class="w"> </span><span class="p">|</span><span class="w">                      </span><span class="m">1</span><span class="w"> </span><span class="p">|</span><span class="w">                         </span><span class="m">0</span><span class="w"> </span><span class="p">|</span><span class="w">                        </span><span class="m">0</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="o">[]</span>
+<span class="o">(</span><span class="m">1</span><span class="w"> </span>row<span class="o">)</span>
+</code></pre></div>
+<p>As promised, the manifest list table show us a list of the manifest files (or file, in this case) associated with our current state.</p>
+<p>Lastly, let's look at what the manifests can tell us. To do so, we call on the <code>files</code> hidden table:</p>
+<div class="highlight"><pre><span></span><code>presto:minio&gt;<span class="w"> </span>SELECT<span class="w"> </span>*<span class="w"> </span>FROM<span class="w"> </span><span class="s2">&quot;books</span><span class="nv">$files</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="w"> </span>content<span class="w"> </span><span class="p">|</span><span class="w">                                    </span>file_path<span class="w">                                    </span><span class="p">|</span><span class="w"> </span>file_format<span class="w"> </span><span class="p">|</span><span class="w"> </span>record_count<span class="w"> </span><span class="p">|</span><span class="w"> </span>file_size_in_bytes<span class="w"> </span><span class="p">|</span><span class="w">     </span>column_sizes<span class="w">     </span><span class="p">|</span><span class="w">  </span>value_counts<span class="w">   </span><span class="p">|</span><span class="w"> </span>null_value_counts<span class="w"> </span><span class="p">|</span><span class="w"> </span>nan_value_counts<span class="w"> </span><span class="p">|</span><span class="w">                 </span>lower_bounds<span class="w">                  </span><span class="p">|</span><span class="w">               </span>upper_bounds<span class="w">               </span><span class="p">|</span><span class="w"> </span>key_metadata<span class="w"> </span><span class="p">|</span><span class="w"> </span>split_offsets<span class="w"> </span><span class="p">|</span><span class="w"> </span>equality_ids
+---------+---------------------------------------------------------------------------------+-------------+--------------+--------------------+----------------------+-----------------+-------------------+------------------+-----------------------------------------------+------------------------------------------+--------------+---------------+--------------
+<span class="w">       </span><span class="m">0</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>s3a://warehouse/minio/books/data/27b61673-a995-4810-9aa5-b4675b8483ce.parquet<span class="w"> </span><span class="p">|</span><span class="w"> </span>PARQUET<span class="w">     </span><span class="p">|</span><span class="w">            </span><span class="m">3</span><span class="w"> </span><span class="p">|</span><span class="w">                </span><span class="m">579</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="o">{</span><span class="nv">1</span><span class="o">=</span><span class="m">52</span>,<span class="w"> </span><span class="nv">2</span><span class="o">=</span><span class="m">124</span>,<span class="w"> </span><span class="nv">3</span><span class="o">=</span><span class="m">103</span><span class="o">}</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="o">{</span><span class="nv">1</span><span class="o">=</span><span class="m">3</span>,<span class="w"> </span><span class="nv">2</span><span class="o">=</span><span class="m">3</span>,<span class="w"> </span><span class="nv">3</span><span class="o">=</span><span class="m">3</span><span class="o">}</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="o">{</span><span class="nv">1</span><span class="o">=</span><span class="m">0</span>,<span class="w"> </span><span class="nv">2</span><span class="o">=</span><span class="m">0</span>,<span class="w"> </span><span class="nv">3</span><span class="o">=</span><span class="m">0</span><span class="o">}</span><span class="w">   </span><span class="p">|</span><span class="w"> </span><span class="o">{}</span><span class="w">               </span><span class="p">|</span><span class="w"> </span><span class="o">{</span><span class="nv">1</span><span class="o">=</span><span class="m">1</span>,<span class="w"> </span><span class="nv">2</span><span class="o">=</span>Pride<span class="w"> </span>and<span class="w"> </span>Prejud,<span class="w"> </span><span class="nv">3</span><span class="o">=</span>F.<span class="w"> </span>Scott<span class="w"> </span>Fitzger<span class="o">}</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="o">{</span><span class="nv">1</span><span class="o">=</span><span class="m">3</span>,<span class="w"> </span><span class="nv">2</span><span class="o">=</span>To<span class="w"> </span>Kill<span class="w"> </span>a<span class="w"> </span>Mockio,<span class="w"> </span><span class="nv">3</span><span class="o">=</span>Jane<span class="w"> </span>Austen<span class="o">}</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>NULL<span class="w">         </span><span class="p">|</span><span class="w"> </span>NULL<span class="w">          </span><span class="p">|</span><span class="w"> </span>NULL
+<span class="o">(</span><span class="m">1</span><span class="w"> </span>row<span class="o">)</span>
+</code></pre></div>
+<p>We have here a path to the data file and some metadata for that file that can help when determining which files need to be accessed for a certain query.</p>
+<p>There are other hidden tables as well that you can interrogate. Here is a summary of all hidden tables that Presto can provide:</p>
+<ul>
+<li><code>$properties</code>: General properties of the given table</li>
+<li><code>$history</code>: History of table state changes</li>
+<li><code>$snapshots</code>: Details about the table snapshots</li>
+<li><code>$manifests</code>: Details about the manifest lists of different table snapshots</li>
+<li><code>$partitions</code>: Detailed partition information for the table</li>
+<li><code>$files</code>: Overview of data files in the current snapshot of the table</li>
+</ul>
+<h2 id="3-iceberg-schema-evolution">3. Iceberg schema evolution<a class="headerlink" href="#3-iceberg-schema-evolution" title="Permanent link">&para;</a></h2>
+<p>The Iceberg connector also supports in-place table evolution, aka schema evolution, such as adding, dropping, and renaming columns. This is one of Iceberg's key features. Let's try it. Let's say we want to add a column to indicate whether a book has been checked out. We'll run the following command to do so:</p>
+<div class="highlight"><pre><span></span><code>presto:minio&gt;<span class="w"> </span>ALTER<span class="w"> </span>TABLE<span class="w"> </span>books<span class="w"> </span>ADD<span class="w"> </span>COLUMN<span class="w"> </span>checked_out<span class="w"> </span>boolean<span class="p">;</span>
+ADD<span class="w"> </span>COLUMN
+</code></pre></div>
+<p>At this point, a new <code>.metadata.json</code> file is created and can be viewed in the MinIO UI, but, once again, no updates to the other metadata files or the hidden tables take place until data is added. The library comes into the possession of a new book and it is immediately checked out. We can add data for that:</p>
+<div class="highlight"><pre><span></span><code>presto:minio&gt;<span class="w"> </span>INSERT<span class="w"> </span>INTO<span class="w"> </span>books<span class="w"> </span>VALUES<span class="w"> </span><span class="o">(</span><span class="m">4</span>,<span class="w"> </span><span class="s1">&#39;One Hundred Years of Solitude&#39;</span>,<span class="w"> </span><span class="s1">&#39;Gabriel Garcia Marquez&#39;</span>,<span class="w"> </span><span class="nb">true</span><span class="o">)</span><span class="p">;</span>
+INSERT:<span class="w"> </span><span class="m">1</span><span class="w"> </span>row
+
+Query<span class="w"> </span>20231123_025430_00013_79xda,<span class="w"> </span>FINISHED,<span class="w"> </span><span class="m">1</span><span class="w"> </span>node
+Splits:<span class="w"> </span><span class="m">35</span><span class="w"> </span>total,<span class="w"> </span><span class="m">35</span><span class="w"> </span><span class="k">done</span><span class="w"> </span><span class="o">(</span><span class="m">100</span>.00%<span class="o">)</span>
+<span class="o">[</span>Latency:<span class="w"> </span>client-side:<span class="w"> </span><span class="m">0</span>:01,<span class="w"> </span>server-side:<span class="w"> </span><span class="m">0</span>:01<span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span>rows,<span class="w"> </span>0B<span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="w"> </span>rows/s,<span class="w"> </span>0B/s<span class="o">]</span>
+</code></pre></div>
+<p>At this point, a new snapshot is made current, which we can see by querying the hidden snapshot table:</p>
+<div class="highlight"><pre><span></span><code>presto:minio&gt;<span class="w"> </span>SELECT<span class="w"> </span>*<span class="w"> </span>FROM<span class="w"> </span><span class="s2">&quot;books</span><span class="nv">$snapshots</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="w">        </span>committed_at<span class="w">         </span><span class="p">|</span><span class="w">     </span>snapshot_id<span class="w">     </span><span class="p">|</span><span class="w">      </span>parent_id<span class="w">      </span><span class="p">|</span><span class="w"> </span>operation<span class="w"> </span><span class="p">|</span><span class="w">                                                </span>manifest_list<span class="w">                                                </span><span class="p">|</span><span class="w">                                                                                                           </span>summary
+-----------------------------+---------------------+---------------------+-----------+-------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+<span class="w"> </span><span class="m">2023</span>-12-04<span class="w"> </span><span class="m">03</span>:22:51.654<span class="w"> </span>UTC<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">7120201811871583704</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>NULL<span class="w">                </span><span class="p">|</span><span class="w"> </span>append<span class="w">    </span><span class="p">|</span><span class="w"> </span>s3a://warehouse/minio/books/metadata/snap-7120201811871583704-1-c736f70c-53b0-46bd-93e5-5df38eb0ef62.avro<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="o">{</span>changed-partition-count<span class="o">=</span><span class="m">1</span>,<span class="w"> </span>added-data-files<span class="o">=</span><span class="m">1</span>,<span class="w"> </span>total-equality-deletes<span class="o">=</span><span class="m">0</span>,<span class="w"> </span>added-records<span class="o">=</span><span class="m">3</span>,<span class="w"> </span>total-position-deletes<span class="o">=</span><span class="m">0</span>,<span class="w"> </span>added-files-size<span class="o">=</span><span class="m">579</span>,<span class="w"> </span>total-delete-files<span class="o">=</span><span class="m">0</span>,<span class="w"> </span>total-files-size<span class="o">=</span><span class="m">579</span>,<span class="w"> </span>total-records<span class="o">=</span><span class="m">3</span>,<span class="w"> </span>total-data-files<span class="o">=</span><span class="m">1</span><span class="o">}</span>
+<span class="w"> </span><span class="m">2023</span>-12-04<span class="w"> </span><span class="m">03</span>:33:37.630<span class="w"> </span>UTC<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">5122816232892408908</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">7120201811871583704</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>append<span class="w">    </span><span class="p">|</span><span class="w"> </span>s3a://warehouse/minio/books/metadata/snap-5122816232892408908-1-973a8dc3-8103-4df7-8324-1fa13a2f1202.avro<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="o">{</span>changed-partition-count<span class="o">=</span><span class="m">1</span>,<span class="w"> </span>added-data-files<span class="o">=</span><span class="m">1</span>,<span class="w"> </span>total-equality-deletes<span class="o">=</span><span class="m">0</span>,<span class="w"> </span>added-records<span class="o">=</span><span class="m">1</span>,<span class="w"> </span>total-position-deletes<span class="o">=</span><span class="m">0</span>,<span class="w"> </span>added-files-size<span class="o">=</span><span class="m">765</span>,<span class="w"> </span>total-delete-files<span class="o">=</span><span class="m">0</span>,<span class="w"> </span>total-files-size<span class="o">=</span><span class="m">1344</span>,<span class="w"> </span>total-records<span class="o">=</span><span class="m">4</span>,<span class="w"> </span>total-data-files<span class="o">=</span><span class="m">2</span><span class="o">}</span>
+<span class="o">(</span><span class="m">2</span><span class="w"> </span>rows<span class="o">)</span>
+</code></pre></div>
+<p>The output confirms that we now have a new snapshot, and a new manifest list file representing it.</p>
+<h2 id="4-iceberg-time-travel">4. Iceberg time travel<a class="headerlink" href="#4-iceberg-time-travel" title="Permanent link">&para;</a></h2>
+<p>Another popular feature of Iceberg is time travel, wherein we can query the table state from a given time or snapshot ID. It's also possible to rollback the state of a table to a previous snapshot using its ID. For the purposes of our example, let's say the person that checked out <em>One Hundred Days of Solitude</em> enjoyed it so much that they bought it from the library, taking it out of the inventory. We want to roll the table state back to before we inserted the latest row. Let's first get our snapshot IDs.</p>
+<div class="highlight"><pre><span></span><code>presto:minio&gt;<span class="w"> </span>SELECT<span class="w"> </span>snapshot_id,<span class="w"> </span>committed_at<span class="w"> </span>FROM<span class="w"> </span><span class="s2">&quot;books</span><span class="nv">$snapshots</span><span class="s2">&quot;</span><span class="w"> </span>ORDER<span class="w"> </span>BY<span class="w"> </span>committed_at<span class="p">;</span>
+<span class="w">     </span>snapshot_id<span class="w">     </span><span class="p">|</span><span class="w">        </span>committed_at
+---------------------+-----------------------------
+<span class="w"> </span><span class="m">7120201811871583704</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">2023</span>-12-04<span class="w"> </span><span class="m">03</span>:22:51.654<span class="w"> </span>UTC
+<span class="w"> </span><span class="m">5122816232892408908</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="m">2023</span>-12-04<span class="w"> </span><span class="m">03</span>:33:37.630<span class="w"> </span>UTC
+<span class="o">(</span><span class="m">2</span><span class="w"> </span>rows<span class="o">)</span>
+</code></pre></div>
+<p>Let's verify that the table is in the expected state at our earliest snapshot ID:</p>
+<div class="highlight"><pre><span></span><code>presto:minio&gt;<span class="w"> </span>SELECT<span class="w"> </span>*<span class="w"> </span>FROM<span class="w"> </span>books<span class="w"> </span>FOR<span class="w"> </span>VERSION<span class="w"> </span>AS<span class="w"> </span>OF<span class="w"> </span><span class="m">7120201811871583704</span><span class="p">;</span>
+<span class="w"> </span>id<span class="w"> </span><span class="p">|</span><span class="w">         </span>title<span class="w">         </span><span class="p">|</span><span class="w">       </span>author<span class="w">        </span><span class="p">|</span><span class="w"> </span>checked_out
+----+-----------------------+---------------------+-------------
+<span class="w">  </span><span class="m">1</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>Pride<span class="w"> </span>and<span class="w"> </span>Prejudice<span class="w">   </span><span class="p">|</span><span class="w"> </span>Jane<span class="w"> </span>Austen<span class="w">         </span><span class="p">|</span><span class="w"> </span>NULL
+<span class="w">  </span><span class="m">2</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>To<span class="w"> </span>Kill<span class="w"> </span>a<span class="w"> </span>Mockingbird<span class="w"> </span><span class="p">|</span><span class="w"> </span>Harper<span class="w"> </span>Lee<span class="w">          </span><span class="p">|</span><span class="w"> </span>NULL
+<span class="w">  </span><span class="m">3</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>The<span class="w"> </span>Great<span class="w"> </span>Gatsby<span class="w">      </span><span class="p">|</span><span class="w"> </span>F.<span class="w"> </span>Scott<span class="w"> </span>Fitzgerald<span class="w"> </span><span class="p">|</span><span class="w"> </span>NULL
+<span class="o">(</span><span class="m">3</span><span class="w"> </span>rows<span class="o">)</span>
+</code></pre></div>
+<p>We could also do the same thing using a timestamp or date. If you run this query, make sure you change the timestamp so that it's accurate for the time at which you're following along.</p>
+<div class="highlight"><pre><span></span><code>presto:minio&gt;<span class="w"> </span>SELECT<span class="w"> </span>*<span class="w"> </span>FROM<span class="w"> </span>books<span class="w"> </span>FOR<span class="w"> </span>TIMESTAMP<span class="w"> </span>AS<span class="w"> </span>OF<span class="w"> </span>TIMESTAMP<span class="w"> </span><span class="s1">&#39;2023-12-04 03:22:51.700 UTC&#39;</span><span class="p">;</span>
+<span class="w"> </span>id<span class="w"> </span><span class="p">|</span><span class="w">         </span>title<span class="w">         </span><span class="p">|</span><span class="w">       </span>author<span class="w">        </span><span class="p">|</span><span class="w"> </span>checked_out
+----+-----------------------+---------------------+-------------
+<span class="w">  </span><span class="m">1</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>Pride<span class="w"> </span>and<span class="w"> </span>Prejudice<span class="w">   </span><span class="p">|</span><span class="w"> </span>Jane<span class="w"> </span>Austen<span class="w">         </span><span class="p">|</span><span class="w"> </span>NULL
+<span class="w">  </span><span class="m">2</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>To<span class="w"> </span>Kill<span class="w"> </span>a<span class="w"> </span>Mockingbird<span class="w"> </span><span class="p">|</span><span class="w"> </span>Harper<span class="w"> </span>Lee<span class="w">          </span><span class="p">|</span><span class="w"> </span>NULL
+<span class="w">  </span><span class="m">3</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>The<span class="w"> </span>Great<span class="w"> </span>Gatsby<span class="w">      </span><span class="p">|</span><span class="w"> </span>F.<span class="w"> </span>Scott<span class="w"> </span>Fitzgerald<span class="w"> </span><span class="p">|</span><span class="w"> </span>NULL
+<span class="o">(</span><span class="m">3</span><span class="w"> </span>rows<span class="o">)</span>
+</code></pre></div>
+<p>Now that we've verified the table state that we want to roll back to, we can call a procedure on the "iceberg" catalog's built-in <code>system</code> schema to do so:</p>
+<div class="highlight"><pre><span></span><code>presto:minio&gt;<span class="w"> </span>CALL<span class="w"> </span>iceberg.system.rollback_to_snapshot<span class="o">(</span><span class="s1">&#39;minio&#39;</span>,<span class="w"> </span><span class="s1">&#39;books&#39;</span>,<span class="w"> </span><span class="m">7120201811871583704</span><span class="o">)</span><span class="p">;</span>
+CALL
+</code></pre></div>
+<p>Let's verify that the table is back to how it was before:</p>
+<div class="highlight"><pre><span></span><code>presto:minio&gt;<span class="w"> </span>SELECT<span class="w"> </span>*<span class="w"> </span>FROM<span class="w"> </span>books<span class="p">;</span>
+<span class="w"> </span>id<span class="w"> </span><span class="p">|</span><span class="w">         </span>title<span class="w">         </span><span class="p">|</span><span class="w">       </span>author<span class="w">        </span><span class="p">|</span><span class="w"> </span>checked_out
+----+-----------------------+---------------------+-------------
+<span class="w">  </span><span class="m">1</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>Pride<span class="w"> </span>and<span class="w"> </span>Prejudice<span class="w">   </span><span class="p">|</span><span class="w"> </span>Jane<span class="w"> </span>Austen<span class="w">         </span><span class="p">|</span><span class="w"> </span>NULL
+<span class="w">  </span><span class="m">2</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>To<span class="w"> </span>Kill<span class="w"> </span>a<span class="w"> </span>Mockingbird<span class="w"> </span><span class="p">|</span><span class="w"> </span>Harper<span class="w"> </span>Lee<span class="w">          </span><span class="p">|</span><span class="w"> </span>NULL
+<span class="w">  </span><span class="m">3</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>The<span class="w"> </span>Great<span class="w"> </span>Gatsby<span class="w">      </span><span class="p">|</span><span class="w"> </span>F.<span class="w"> </span>Scott<span class="w"> </span>Fitzgerald<span class="w"> </span><span class="p">|</span><span class="w"> </span>NULL
+<span class="o">(</span><span class="m">3</span><span class="w"> </span>rows<span class="o">)</span>
+</code></pre></div>
+<p>Notice that the table still includes the <code>checked_out</code> column. This is to be expected because the snapshot only changes when data files are written to. Removing the column would be another schema evolution operation that only changes the <code>.metadata.json</code> file and not the snapshot itself.</p>
+<p>You just explored some of Iceberg's key features using Presto! Presto's Iceberg connector has more features than those we've gone over today, such as partitioning and partition column transforms, as well as additional features that are soon-to-come!</p>
+<p><img src="https://count.asgharlabs.io/count?p=/lab3_presto_iceberg_page"></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2023 IBM Developer
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/ibm" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://twitter.com/ibmdeveloper" target="_blank" rel="noopener" title="twitter.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M459.4 151.7c.3 4.5.3 9.1.3 13.6 0 138.7-105.6 298.6-298.6 298.6-59.5 0-114.7-17.2-161.1-47.1 8.4 1 16.6 1.3 25.3 1.3 49.1 0 94.2-16.6 130.3-44.8-46.1-1-84.8-31.2-98.1-72.8 6.5 1 13 1.6 19.8 1.6 9.4 0 18.8-1.3 27.6-3.6-48.1-9.7-84.1-52-84.1-103v-1.3c14 7.8 30.2 12.7 47.4 13.3-28.3-18.8-46.8-51-46.8-87.4 0-19.5 5.2-37.4 14.3-53C87.4 130.8 165 172.4 252.1 176.9c-1.6-7.8-2.6-15.9-2.6-24C249.5 95.1 296.3 48 354.4 48c30.2 0 57.5 12.7 76.7 33.1 23.7-4.5 46.5-13.3 66.6-25.3-7.8 24.4-24.4 44.8-46.1 57.8 21.1-2.3 41.6-8.1 60.4-16.2-14.3 20.8-32.2 39.3-52.6 54.3"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://www.linkedin.com/company/ibm/" target="_blank" rel="noopener" title="www.linkedin.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3M135.4 416H69V202.2h66.5V416zM102.2 96a38.5 38.5 0 1 1 0 77 38.5 38.5 0 1 1 0-77m282.1 320h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://www.youtube.com/user/developerworks" target="_blank" rel="noopener" title="www.youtube.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M549.7 124.1c-6.2-23.7-24.8-42.3-48.3-48.6C458.9 64 288.1 64 288.1 64S117.3 64 74.7 75.5c-23.5 6.3-42 24.9-48.3 48.6C15 167 15 256.4 15 256.4s0 89.4 11.4 132.3c6.3 23.6 24.8 41.5 48.3 47.8C117.3 448 288.1 448 288.1 448s170.8 0 213.4-11.5c23.5-6.3 42-24.2 48.3-47.8 11.4-42.9 11.4-132.3 11.4-132.3s0-89.4-11.4-132.3zM232.2 337.6V175.2l142.7 81.2z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://dev.to/ibmdeveloper" target="_blank" rel="noopener" title="dev.to" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M120.1 208.3c-3.9-2.9-7.8-4.3-11.6-4.3H91.1v104.5h17.4c3.9 0 7.8-1.4 11.6-4.3s5.8-7.3 5.8-13.1v-69.7c0-5.8-2-10.2-5.8-13.1M404.1 32H43.9C19.7 32 .1 51.6 0 75.8v360.4C.1 460.4 19.7 480 43.9 480h360.2c24.2 0 43.8-19.6 43.9-43.8V75.8c-.1-24.2-19.7-43.8-43.9-43.8M154.2 291.2c0 18.8-11.6 47.3-48.4 47.3H59.4V173h47.4c35.4 0 47.4 28.5 47.4 47.3zm100.7-88.7h-53.3v38.4h32.6v29.6h-32.6v38.4h53.3v29.6h-62.2c-11.2.3-20.4-8.5-20.7-19.7V193.7c-.3-11.1 8.6-20.4 19.7-20.7h63.2zm103.6 115.3c-13.2 30.7-36.8 24.6-47.4 0L272.6 173h32.6l29.7 113.7L364.5 173h32.6l-38.5 144.8z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs"], "search": "../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.f55a23d4.min.js"></script>
+      
+    
+  </body>
+</html>
