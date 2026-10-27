@@ -27,7 +27,7 @@ for i, row in df.iterrows():
     print(f"Connecting to host {public_ip}...")
     ssh = paramiko.SSHClient()
     key = paramiko.RSAKey.from_private_key_file(PEM_FILE_NAME)
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh.set_missing_host_key_policy(paramiko.RejectPolicy())
     ssh.connect(hostname=public_ip, username=username, pkey=key, port=port)
 
     # remove created key file

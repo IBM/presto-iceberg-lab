@@ -81,7 +81,7 @@ def set_up():
 
         print(f"Connecting to host {public_ip}...")
         ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.set_missing_host_key_policy(paramiko.RejectPolicy())
         ssh.connect(hostname=public_ip, username=username, pkey=key, port=port)
 
         # clone repo
@@ -121,7 +121,7 @@ def check():
 
         print(f"Connecting to host {public_ip}...")
         ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.set_missing_host_key_policy(paramiko.RejectPolicy())
         ssh.connect(hostname=public_ip, username=username, pkey=key, port=port)
 
         print(f"Checking that repository is cloned...")
